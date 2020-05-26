@@ -79,7 +79,7 @@
         </div>
         <el-dialog :visible.sync="dialogVisible" width="50%" :close-on-click-modal="closeFlag">
             <div slot="title" class="dialog-head">{{dialogTitle}}</div>
-            <locator-dialog :form="form" :flag="searchFlag"></locator-dialog>
+            <locator-dialog :data="form" :flag="searchFlag" ref="dialogData"></locator-dialog>
             <div slot="footer">
                 <el-button @click="cancelAdd">取 消</el-button>
                 <el-button type="primary" @click="confirmSubmit">确 定</el-button>
@@ -89,209 +89,212 @@
 </template>
 
 <script>
-  import DatePeriodSelect from '@/components/Search/DatePeriodSelect'
-  import KeyWordSearch from '@/components/Search/KeyWordSearch'
-  import Pagination from '@/components/Pagination'
-  import { Message } from 'element-ui'
-  import LocatorDialog from './LocatorDialog'
-  import {
-    queryLocatorList,
-    saveOrUpdateLocator,
-    deleteLocatorList,
-    deleteLocatorById
-  } from '../../../../api/model/locator'
+    import DatePeriodSelect from '@/components/Search/DatePeriodSelect'
+    import KeyWordSearch from '@/components/Search/KeyWordSearch'
+    import Pagination from '@/components/Pagination'
+    import {Message} from 'element-ui'
+    import LocatorDialog from './LocatorDialog'
+    import {
+        queryLocatorList,
+        saveOrUpdateLocator,
+        deleteLocatorList,
+        deleteLocatorById
+    } from '../../../../api/model/locator'
 
-  export default {
-    name: 'index',
-    components: {
-      DatePeriodSelect,
-      KeyWordSearch,
-      Pagination,
-      LocatorDialog
-    },
-    data() {
-      return {
-        closeFlag: false,
-        tableData: [],
-        plantList: [
-          {
-            id: 1,
-            plantId: 1,
-            plantName: '上海外高桥一场',
-            plantCode: 'WGQ1'
-          },
-          {
-            id: 2,
-            plantId: 2,
-            plantName: '上海外高桥二场',
-            plantCode: 'WGQ2'
-          }
-        ],
-        listQuery: {
-          page: 1,
-          limit: 20,
-          offset: 0,
-          selectOperationType: '',
-          selectApplication: '',
-          startTime: '',
-          endTime: ''
+    export default {
+        name: 'index',
+        components: {
+            DatePeriodSelect,
+            KeyWordSearch,
+            Pagination,
+            LocatorDialog
         },
-        total: 4,
-        dialogVisible: false,
-        dialogTitle: '新增货位',
-        form: {},
-        tableHeight: 500,
-        searchFlag: false
-      }
-    },
-    created() {
-      this.initTime()
-    },
-    methods: {
-      initTime() {
-        this.listQuery.startTime = this.$moment().subtract('days', 30).format('YYYY-MM-DD')
-        this.listQuery.endTime = this.$moment().format('YYYY-MM-DD')
-        this.selectedDate = [this.listQuery.startTime, this.listQuery.endTime]
-        this.initData()
-      },
-      initData() {
-        const that = this
-        this.loading = true
-        setTimeout(() => {
-          queryLocatorList({
-            current: this.listQuery.page,
-            size: this.listQuery.limit
-          }, this.form).then(res => {
-            if (res.code == 200) {
-              that.tableData = res.data.records
-              this.total = res.data.total
-              that.loading = false
-            } else {
-              Message.error(res.msg)
+        data() {
+            return {
+                closeFlag: false,
+                tableData: [],
+                plantList: [
+                    {
+                        id: 1,
+                        plantId: 1,
+                        plantName: '上海外高桥一场',
+                        plantCode: 'WGQ1'
+                    },
+                    {
+                        id: 2,
+                        plantId: 2,
+                        plantName: '上海外高桥二场',
+                        plantCode: 'WGQ2'
+                    }
+                ],
+                listQuery: {
+                    page: 1,
+                    limit: 20,
+                    offset: 0,
+                    selectOperationType: '',
+                    selectApplication: '',
+                    startTime: '',
+                    endTime: ''
+                },
+                total: 4,
+                dialogVisible: false,
+                dialogTitle: '新增货位',
+                form: {},
+                tableHeight: 500,
+                searchFlag: false
             }
-          }).catch(e => {
-            Message.error(e)
-          })
-        }, 500)
-      },
-      supplierAdd() {
-        this.dialogVisible = true
-        this.form = {}
-        this.searchFlag = false
-        this.dialogTitle = '新增货位'
-      },
-      cancelAdd() {
-        this.dialogVisible = false
-        this.form = {}
-      },
-      confirmSubmit() {
-        if (this.form.enableFlag != null) {
-          this.form.enableFlag = parseInt(this.form.enableFlag)
+        },
+        created() {
+            this.initTime()
+        },
+        methods: {
+            initTime() {
+                this.listQuery.startTime = this.$moment().subtract('days', 30).format('YYYY-MM-DD')
+                this.listQuery.endTime = this.$moment().format('YYYY-MM-DD')
+                this.selectedDate = [this.listQuery.startTime, this.listQuery.endTime]
+                this.initData()
+            },
+            initData() {
+                const that = this
+                this.loading = true
+                setTimeout(() => {
+                    queryLocatorList({
+                        current: this.listQuery.page,
+                        size: this.listQuery.limit
+                    }, this.form).then(res => {
+                        if (res.code == 200) {
+                            that.tableData = res.data.records
+                            this.total = res.data.total
+                            that.loading = false
+                        } else {
+                            Message.error(res.msg)
+                        }
+                    }).catch(e => {
+                        Message.error(e)
+                    })
+                }, 500)
+            },
+            supplierAdd() {
+                this.dialogVisible = true
+                this.form = {}
+                this.searchFlag = false
+                this.dialogTitle = '新增货位'
+            },
+            cancelAdd() {
+                this.dialogVisible = false
+                this.form = {}
+            },
+            confirmSubmit() {
+                // console.log(this.$refs.dialogData.form)
+                let form = JSON.parse(JSON.stringify(this.$refs.dialogData.form))
+                this.form = form
+                if (this.form.enableFlag != null) {
+                    this.form.enableFlag = parseInt(this.form.enableFlag)
+                }
+                if (this.searchFlag) {
+                    queryLocatorList({
+                        current: this.listQuery.page,
+                        size: this.listQuery.limit
+                    }, this.form).then(res => {
+                        if (res.code == 200) {
+                            this.tableData = res.data.records
+                            this.total = res.data.total
+                            this.dialogVisible = false
+                        } else {
+                            Message.error(res.msg)
+                        }
+                    }).catch(e => {
+                        Message.error(e)
+                    })
+                } else {
+                    saveOrUpdateLocator(this.form).then(res => {
+                        if (res.code == 200) {
+                            Message.success(res.msg)
+                            this.form = {}
+                            this.dialogVisible = false
+                            this.initData()
+                        } else {
+                            Message.error(res.msg)
+                        }
+                    }).catch(e => {
+                        Message.error(e)
+                    })
+                }
+            },
+            /**
+             * @description: 获取时间区间
+             * @param date 时间范围
+             */
+            getSelectedDate(date) {
+                this.listQuery.startTime = date[0]
+                this.listQuery.endTime = date[1]
+                this.initData()
+            },
+            deleteOrderList() {
+                //批量删除
+                let selectList = this.$refs.table.selection
+                let headIdList = [] //初始化headIdList
+                for (let t of selectList) {
+                    headIdList.push(t.locatorId)
+                }
+                this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    deleteLocatorList(headIdList).then(res => {
+                        if (res.code == 200) {
+                            Message.success('删除成功')
+                            this.initData()
+                        } else {
+                            Message.error(res.msg)
+                        }
+                    }).catch(e => {
+                        Message.error(e)
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    })
+                })
+            },
+            deleteSupplier(data) {
+                this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    deleteLocatorById(data.locatorId).then(res => {
+                        if (res.code == 200) {
+                            Message.success(res.msg)
+                            this.initData()
+                        } else {
+                            Message.error(res.msg)
+                        }
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    })
+                })
+            },
+            searchData() {
+                this.form = {}
+                this.dialogVisible = true
+                this.searchFlag = true
+                this.dialogTitle = '货位查询'
+            },
+            editSupplier(data) {
+                this.searchFlag = false
+                this.dialogVisible = true
+                this.form = data
+                this.form.enableFlag = this.form.enableFlag ? '1' : '0'
+                this.dialogTitle = '编辑货位'
+            }
         }
-          if (this.searchFlag) {
-          queryLocatorList({
-            current: this.listQuery.page,
-            size: this.listQuery.limit
-          }, this.form).then(res => {
-            if (res.code == 200) {
-              this.tableData = res.data.records
-              this.total = res.data.total
-              this.dialogVisible = false
-            } else {
-              Message.error(res.msg)
-            }
-          }).catch(e => {
-            Message.error(e)
-          })
-        } else {
-          saveOrUpdateLocator(this.form).then(res => {
-            if (res.code == 200) {
-              Message.success(res.msg)
-              this.form = {}
-              this.dialogVisible = false
-              this.initData()
-            } else {
-              Message.error(res.msg)
-            }
-          }).catch(e => {
-            Message.error(e)
-          })
-        }
-      },
-      /**
-       * @description: 获取时间区间
-       * @param date 时间范围
-       */
-      getSelectedDate(date) {
-        this.listQuery.startTime = date[0]
-        this.listQuery.endTime = date[1]
-        this.initData()
-      },
-      deleteOrderList() {
-        //批量删除
-        let selectList = this.$refs.table.selection
-        let headIdList = [] //初始化headIdList
-        for (let t of selectList) {
-          headIdList.push(t.locatorId)
-        }
-        this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          deleteLocatorList(headIdList).then(res => {
-            if (res.code == 200) {
-              Message.success('删除成功')
-              this.initData()
-            } else {
-              Message.error(res.msg)
-            }
-          }).catch(e => {
-            Message.error(e)
-          })
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
-      },
-      deleteSupplier(data) {
-        this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          deleteLocatorById(data.locatorId).then(res => {
-            if (res.code == 200) {
-              Message.success(res.msg)
-              this.initData()
-            } else {
-              Message.error(res.msg)
-            }
-          })
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
-      },
-      searchData() {
-        this.form = {}
-        this.dialogVisible = true
-        this.searchFlag = true
-        this.dialogTitle = '货位查询'
-      },
-      editSupplier(data) {
-        this.searchFlag = false
-        this.dialogVisible = true
-        this.form = data
-        this.form.enableFlag = this.form.enableFlag ? '0' : '1'
-        this.dialogTitle = '编辑货位'
-      }
     }
-  }
 </script>
 
 <style scoped>
