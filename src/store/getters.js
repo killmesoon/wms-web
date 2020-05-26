@@ -1,0 +1,25 @@
+const getters = {
+  sidebar: state => state.app.sidebar,
+  device: state => state.app.device,
+  name: state => state.user.name,
+  number: state => state.user.number,
+  loginName: state => state.user.loginName,
+  phone: state => state.user.phone,
+  email: state => state.user.email,
+  authorities: state => state.user.authorities,
+  menus: state => state.user.menus,
+  visitedViews: state => state.tagsView.visitedViews,
+  cachedViews: state => state.tagsView.cachedViews,
+  headIdFlag: state => state.inbound.headIdFlag,
+  dicInboundOrderTypeList: state => state.dic.dicInboundOrderTypeList,
+  dicDocStatusList: state => state.dic.dicDocStatusList,
+  dicSourceOrderTypeList: state => state.dic.dicSourceOrderTypeList,
+  outboundHeadIdFlag: state => state.inbound.outboundHeadIdFlag,
+  dicSupplierTypeList: state => state.dic.dicSupplierTypeList,
+  dicSupplierStatusList: state => state.dic.dicSupplierStatusList,
+  dicYNList: state => state.dic.dicYNList,
+  dicWarehouseTypeList: state => state.dic.dicWarehouseTypeList,
+  dicAreaTypeList: state => state.dic.dicAreaTypeList,
+  dicLocatorTypeList: state => state.dic.dicLocatorTypeList
+}
+export default getters

@@ -1,0 +1,187 @@
+@import './variables.scss';
+@import './mixin.scss';
+@import './transition.scss';
+@import './element-ui.scss';
+@import './sidebar.scss';
+
+body {
+  height: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
+  background-color:#EEF0F3;
+}
+
+.body-view{
+  margin: 10px 20px;
+  background-color: #fff;
+}
+.white-body-view {
+  margin: 0px;
+  padding: 10px 10px;
+  height: calc(100vh - 84px);
+  background-color: #fff;
+  overflow: auto;
+}
+
+label {
+  font-weight: 700;
+}
+
+html {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+#app {
+  height: 100%;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+a:focus,
+a:active {
+  outline: none;
+}
+
+a,
+a:focus,
+a:hover {
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}
+
+div:focus {
+  outline: none;
+}
+
+.clearfix {
+  &:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+  }
+}
+
+// main-container global css
+.filter-item{
+  margin-bottom: 10px;
+}
+
+.app-container {
+  padding: 20px;
+}
+
+
+.filter-container{
+  padding-bottom: 10px;
+}
+.el-pagination__rightwrapper{
+  float: left !important
+}
+
+.el-dialog{
+  width: 42%
+}
+
+.d2-crud .d2-crud-body{
+  padding: 0 !important
+}
+.el-button+.el-button {
+    margin-left: 0px;
+}
+.el-button [class*=el-icon-]+span {
+    margin-left: 0px;
+}
+
+.el-table td, .el-table th.is-leaf {
+  border-bottom: 1px solid #dfe6ec;
+}
+
+// .el-button--primary {
+//   color: #fff;
+//   background-color: #1890ff;
+//   border-color: #1890ff;
+// }
+
+.el-button--danger {
+  color: #fff;
+  background-color: #ff4949;
+  border-color: #ff4949;
+}
+
+// .text-primary{
+//   color: #1890ff;
+// }
+.text-danger{
+  color:#ff4949;
+}
+.text-success{
+  color:#67C23A;
+}
+
+//吸顶
+.sub-navbar {
+  padding-left: 20px;
+  font-size: 16px;
+  height: 30px;
+  line-height: 30px;
+  position: relative;
+  width: 100%;
+  text-align: right;
+  padding-right: 20px;
+  transition: 600ms ease position;
+  // background: linear-gradient(90deg, rgba(32, 182, 249, 1) 0%, rgba(32, 182, 249, 1) 0%, rgba(33, 120, 241, 1) 100%, rgba(33, 120, 241, 1) 100%);
+  background: #39C16C;
+  color: #ffffff;
+
+  .subtitle {
+    font-size: 20px;
+    color: #fff;
+  }
+
+  &.draft {
+    background: #d0d0d0;
+  }
+
+  &.deleted {
+    background: #d0d0d0;
+  }
+}
+
+
+
+// 优化滚动条样式
+::-webkit-scrollbar {
+  width: 18px;
+  height: 14px;
+}
+ 
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  border: 5px solid transparent;
+}
+ 
+::-webkit-scrollbar-track {
+  box-shadow: 1px 1px 5px rgba(0,0,0,.2) inset;
+}
+ 
+::-webkit-scrollbar-thumb {
+  min-height: 20px;
+  background-clip: content-box;
+  box-shadow: 0 0 0 5px rgba(0,0,0,.2) inset;
+}
+ 
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
