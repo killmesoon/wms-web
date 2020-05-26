@@ -289,7 +289,7 @@
             editSupplier(data) {
                 this.searchFlag = false
                 this.dialogVisible = true
-                this.form = data
+                this.form = JSON.parse(JSON.stringify(data))
                 this.form.enableFlag = this.form.enableFlag ? '1' : '0'
                 this.dialogTitle = '编辑货位'
             }
