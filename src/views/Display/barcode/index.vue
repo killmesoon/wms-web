@@ -29,24 +29,19 @@
                         type="selection"
                         width="30">
                 </el-table-column>
-                <el-table-column prop="warehouseCode" label="工厂编码">
+                <el-table-column prop="barcode" label="工厂编码">
                 </el-table-column>
-                <el-table-column prop="warehouseCode" label="工厂名称">
+                <el-table-column prop="barcode" label="工厂简称">
                 </el-table-column>
-                <el-table-column prop="warehouseCode" label="仓库编码">
+                <el-table-column prop="barcode" label="条码号">
                 </el-table-column>
-                <el-table-column prop="warehouseShortName" label="仓库简称">
+                <el-table-column prop="barcodeTypeDic" label="条码类型">
                 </el-table-column>
-                <el-table-column prop="areaCode" label="区域编码">
+                <el-table-column prop="barcodeStatusDic" label="条码状态">
                 </el-table-column>
-                <el-table-column prop="areaName" label="区域名称">
+                <el-table-column prop="supplierCode" label="供应商编码">
                 </el-table-column>
-                <el-table-column prop="areaTypeDic" label="区域类型">
-                </el-table-column>
-                <el-table-column prop="enableFlag" label="是否有效">
-                    <template slot-scope="scope">
-                        {{scope.row.enableFlag ? 'Y' : 'N'}}
-                    </template>
+                <el-table-column prop="supplierName" label="供应商名称">
                 </el-table-column>
                 <el-table-column prop="description" label="描述">
                 </el-table-column>
@@ -73,7 +68,7 @@
         </div>
         <el-dialog :visible.sync="dialogVisible" width="50%" :close-on-click-modal="closeFlag">
             <div slot="title" class="dialog-head">{{dialogTitle}}</div>
-            <area-dialog :data="form" :flag="searchFlag" ref="dialogArea"></area-dialog>
+            <barcode-dialog :data="form" :flag="searchFlag" ref="dialogBarcode"></barcode-dialog>
             <div slot="footer">
                 <el-button @click="cancelAdd">取 消</el-button>
                 <el-button type="primary" @click="confirmSubmit">确 定</el-button>
@@ -87,14 +82,13 @@
   import KeyWordSearch from '@/components/Search/KeyWordSearch'
   import Pagination from '@/components/Pagination'
   import { Message } from 'element-ui'
-  import AreaDialog from './AreaDialog'
-
+  import BarcodeDialog from './barcodeDialog'
   import {
-    saveOrUpdateWarehouseAreaList,
-    queryWarehouseAreaList,
-    deleteWarehouseAreaList,
-    deleteWarehouseAreaById
-  } from '../../../../api/data/area'
+    queryBarcodeList,
+    saveOrUpdateBarcode,
+    deleteBarCodeByIdList,
+    deleteBarcodeById
+  } from '../../../api/barcode'
 
   export default {
     name: 'index',
@@ -102,7 +96,7 @@
       DatePeriodSelect,
       KeyWordSearch,
       Pagination,
-      AreaDialog
+      BarcodeDialog
     },
     data() {
       return {
@@ -133,7 +127,7 @@
         },
         total: 4,
         dialogVisible: false,
-        dialogTitle: '新增区域',
+        dialogTitle: '新增条码',
         form: {},
         tableHeight: 500,
         searchFlag: false
@@ -153,7 +147,7 @@
         const that = this
         this.loading = true
         setTimeout(() => {
-          queryWarehouseAreaList({
+          queryBarcodeList({
             current: this.listQuery.page,
             size: this.listQuery.limit
           }, this.form).then(res => {
@@ -181,13 +175,13 @@
       },
       confirmSubmit() {
         // console.log(this.$refs.dialogData.form)
-        let form = JSON.parse(JSON.stringify(this.$refs.dialogArea.form))
+        let form = JSON.parse(JSON.stringify(this.$refs.dialogBarcode.form))
         this.form = form
-        if (this.form.enableFlag != null) {
-          this.form.enableFlag = parseInt(this.form.enableFlag)
-        }
+        // if (this.form.enableFlag != null) {
+        //   this.form.enableFlag = parseInt(this.form.enableFlag)
+        // }
         if (this.searchFlag) {
-          queryWarehouseAreaList({
+          queryBarcodeList({
             current: this.listQuery.page,
             size: this.listQuery.limit
           }, this.form).then(res => {
@@ -202,7 +196,7 @@
             Message.error(e)
           })
         } else {
-          saveOrUpdateWarehouseAreaList(this.form).then(res => {
+          saveOrUpdateBarcode(this.form).then(res => {
             if (res.code == 200) {
               Message.success(res.msg)
               this.form = {}
@@ -230,14 +224,14 @@
         let selectList = this.$refs.table.selection
         let headIdList = [] //初始化headIdList
         for (let t of selectList) {
-          headIdList.push(t.areaId)
+          headIdList.push(t.barcodeId)
         }
         this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          deleteWarehouseAreaList(headIdList).then(res => {
+          deleteBarCodeByIdList(headIdList).then(res => {
             if (res.code == 200) {
               Message.success('删除成功')
               this.initData()
@@ -260,7 +254,7 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          deleteWarehouseAreaById(data.areaId).then(res => {
+          deleteBarcodeById(data.barcodeId).then(res => {
             if (res.code == 200) {
               Message.success(res.msg)
               this.initData()
@@ -285,7 +279,9 @@
         this.searchFlag = false
         this.dialogVisible = true
         this.form = JSON.parse(JSON.stringify(data))
-        this.form.enableFlag = this.form.enableFlag ? '1' : '0'
+        // this.form.enableFlag = this.form.enableFlag ? '1' : '0'
+        this.form.barcodeType = parseInt(this.form.barcodeType)
+        this.form.barcodeStatus = parseInt(this.form.barcodeStatus)
         this.dialogTitle = '编辑区域'
       }
     }

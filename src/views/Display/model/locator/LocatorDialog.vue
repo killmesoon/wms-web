@@ -31,7 +31,7 @@
             </el-form-item>
 
             <el-form-item label="区域类型" :label-width="formLabelWidth">
-                <el-input v-model="form.areaType" autocomplete="off"></el-input>
+                <el-input v-model="form.areaTypeDic" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item label="货位编码" :label-width="formLabelWidth">
                 <el-input v-model="form.locatorCode" autocomplete="off"></el-input>
@@ -64,6 +64,7 @@
 <script>
     import {mapGetters} from 'vuex'
     import {getWareHouseList} from '../../../../api/model/warehouse'
+    import {queryWarehouseAreaList} from '../../../../api/data/area'
     import {Message} from 'element-ui'
 
     export default {
@@ -85,6 +86,14 @@
             }).catch(e => {
                 Message.error(e)
             })
+          queryWarehouseAreaList({
+            current: 1,
+            size: -1
+          },{}).then(res => {
+            if (res.code == 200) {
+              this.areaList = res.data.records
+            }
+          })
         },
         data() {
             return {
@@ -106,26 +115,7 @@
                         plantCode: 'WGQ2'
                     }
                 ],
-                areaList: [
-                    {
-                        areaId: 1,
-                        areaCode: 'A',
-                        areaName: '区域A',
-                        areaType: '类型A'
-                    },
-                    {
-                        areaId: 2,
-                        areaCode: 'B',
-                        areaName: '区域B',
-                        areaType: '类型B'
-                    },
-                    {
-                        areaId: 3,
-                        areaCode: 'C',
-                        areaName: '区域C',
-                        areaType: '类型C'
-                    }
-                ]
+                areaList: []
             }
         },
         methods: {
@@ -138,7 +128,7 @@
             },
             areaChange(e) {
                 this.form.areaName = e.areaName
-                this.form.areaType = e.areaType
+                this.form.areaTypeDic = e.areaTypeDic
                 this.form.areaId = e.areaId
             }
         },

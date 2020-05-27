@@ -21,6 +21,8 @@ const getters = {
   dicWarehouseTypeList: state => state.dic.dicWarehouseTypeList,
   dicAreaTypeList: state => state.dic.dicAreaTypeList,
   dicLocatorTypeList: state => state.dic.dicLocatorTypeList,
-  dicUomTypeList: state => state.dic.dicUomTypeList
+  dicUomTypeList: state => state.dic.dicUomTypeList,
+  dicBarcodeTypeList: state => state.dic.dicBarcodeTypeList,
+  dicBarcodeStatusList: state => state.dic.dicBarcodeStatusList
 }
 export default getters
