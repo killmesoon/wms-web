@@ -1,8 +1,16 @@
 <template>
     <div>
-        <el-form :model="form" size="small" label-position="left" :inline="isFormInline">
-            <el-form-item label="订单类型" :label-width="formLabelWidth">
-                <el-select v-model="form.docType" placeholder="请选择订单类型">
+        <el-form :model="form" size="small" ref="inboundOrderForm"  label-position="left" :inline="isFormInline">
+
+            <el-form-item v-if="flag" label="订单类型" :label-width="formLabelWidth" >
+                <el-select v-model="form.docType"  placeholder="请选择订单类型">
+                    <el-option v-for="item in dicInboundOrderTypeList" :key="item.dicCode" :label="item.dicName"
+                               :value="item.dicId"></el-option>
+                </el-select>
+            </el-form-item>
+
+            <el-form-item v-else label="订单类型" :label-width="formLabelWidth" :rules="[{ required: true, message: '请选择订单类型', trigger: 'change' }]" prop="docType">
+                <el-select v-model="form.docType"  placeholder="请选择订单类型">
                     <el-option v-for="item in dicInboundOrderTypeList" :key="item.dicCode" :label="item.dicName"
                                :value="item.dicId"></el-option>
                 </el-select>
@@ -10,15 +18,26 @@
             <el-form-item label="订单号" :label-width="formLabelWidth">
                 <el-input v-model="form.docNumber" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="订单状态" :label-width="formLabelWidth">
+            <el-form-item v-if="flag" label="订单状态" :label-width="formLabelWidth" >
                 <el-select v-model="form.docStatus" placeholder="请选择订单状态">
                     <el-option v-for="item in dicDocStatusList" :key="item.dicCode" :label="item.dicName"
                                :value="item.dicId"></el-option>
                 </el-select>
             </el-form-item>
-        </el-form>
-        <el-form :model="form" size="small" label-position="left" :inline="isFormInline">
-            <el-form-item label="工厂编码" :label-width="formLabelWidth">
+            <el-form-item v-else label="订单状态" :label-width="formLabelWidth" :rules="[{ required: true, message: '请选择订单状态', trigger: 'change' }]" prop="docStatus">
+                <el-select v-model="form.docStatus" placeholder="请选择订单状态" >
+                    <el-option v-for="item in dicDocStatusList" :key="item.dicCode" :label="item.dicName"
+                               :value="item.dicId"></el-option>
+                </el-select>
+            </el-form-item>
+
+            <el-form-item label="工厂编码" v-if="flag" :label-width="formLabelWidth">
+                <el-select v-model="form.plantId" placeholder="请选择工厂编码">
+                    <el-option v-for="item in plantList" :key="item.id" :label="item.plantName"
+                               :value="item.id"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="工厂编码" v-else :label-width="formLabelWidth" :rules="[{ required: true, message: '请选择工厂编码', trigger: 'change' }]" prop="plantId">
                 <el-select v-model="form.plantId" placeholder="请选择工厂编码">
                     <el-option v-for="item in plantList" :key="item.id" :label="item.plantName"
                                :value="item.id"></el-option>
@@ -33,8 +52,6 @@
             <el-form-item label="来源单据号" :label-width="formLabelWidth">
                 <el-input v-model="form.sourceDocNum" autocomplete="off"></el-input>
             </el-form-item>
-        </el-form>
-        <el-form :model="form" size="small" label-position="left" :inline="isFormInline">
             <el-form-item label="计划日期" :label-width="formLabelWidth">
                 <el-date-picker
                         v-model="form.planTime"
@@ -56,7 +73,8 @@
   export default {
     name: 'InboundOrderAdd',
     props:[
-      'form'
+      'form',
+      'flag'
     ],
     data() {
       return {
