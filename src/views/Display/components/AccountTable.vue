@@ -151,17 +151,6 @@
             plantCode: 'WGQ2'
           }
         ],
-        // 操作类型列表
-        operationTypeList: [
-          {
-            value: '1',
-            label: '登录'
-          },
-          {
-            value: '2',
-            label: '退出'
-          }
-        ],
         form: {},
         dialogTitle: '入库单录入',
         formLine: {},

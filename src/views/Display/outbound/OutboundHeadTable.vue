@@ -12,8 +12,9 @@
                 />
             </el-select>
             <!--      <KeyWordSearch input-width="360px" place-holder="支持账户名、显示名称、手机号、邮箱快速搜索" @search="getSearchData" />-->
-            <el-button type="primary" icon="el-icon-plus" @click="dialogHeadVisible = true"> 录入</el-button>
+            <el-button type="primary" icon="el-icon-plus" @click="outboundOrderAdd"> 录入</el-button>
             <el-button type="danger" icon="el-icon-delete"> 批量删除</el-button>
+            <el-button type="primary" icon="el-icon-search" @click="searchOutbound">查询</el-button>
         </div>
         <div>
             <el-table
@@ -80,8 +81,8 @@
             <div slot="title" class="dialog-head">
                 <span>{{dialogTitle}}</span>
             </div>
-            <outbound-order-add :form="form"></outbound-order-add>
-            <outbound-line-add @event1="getFromSon"></outbound-line-add>
+            <outbound-order-add :form="form" :flag="searchFlag" ref="outboundOrderAdd"></outbound-order-add>
+            <outbound-line-add @event1="getFromSon" v-if="!searchFlag"></outbound-line-add>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="cancelAdd">取 消</el-button>
                 <el-button type="primary" @click="confirmSubmit">确 定</el-button>
@@ -113,6 +114,7 @@
         loading: false,
         dialogHeadVisible: false,
         closeFlag: false,
+        searchFlag: false,
         tableData: [],
         test: '',
         tableHeight: 100,
@@ -125,8 +127,6 @@
           startTime: '',
           endTime: ''
         },
-        total: 4,
-        // 应用列表 下拉框使用
         plantList: [
           {
             id: 1,
@@ -141,17 +141,7 @@
             plantCode: 'WGQ2'
           }
         ],
-        // 操作类型列表
-        operationTypeList: [
-          {
-            value: '1',
-            label: '登录'
-          },
-          {
-            value: '2',
-            label: '退出'
-          }
-        ],
+        total: 4,
         form: {},
         dialogTitle: '出库单录入',
         formLine: {},
@@ -244,31 +234,62 @@
       confirmSubmit() {
         //提交出库单录入
         let headId
-        saveOrUpdateOutboundHead(this.form).then(res => {
-          headId = res.data
-          for (let t of this.addOrderLineData) {
-            t.headId = headId
-          }
-          deleteOutboundOrderLinesByHeadId(headId).then(res => {
-            saveOrUpdateOutboundOrderLineList(this.addOrderLineData).then(res => {
+        if (this.searchFlag) {
+          let data = JSON.parse(JSON.stringify(this.form))
+          setTimeout(() => {
+            getOutBoundOrderList({
+              current: this.listQuery.page,
+              size: this.listQuery.limit
+            }, data).then(res => {
               if (res.code == 200) {
-                Message.success(res.msg)
-                this.dialogHeadVisible = false
-                this.initData()
+                this.tableData = res.data.records
+                this.loading = false
+                if (res.data.total  ==0) {
+                  this.$store.dispatch('inbound/setOutboundHeadId', 0)
+                } else {
+                  let first = this.tableData[0]
+                  this.$store.dispatch('inbound/setOutboundHeadId', first.headId)
+                }
                 this.form = {}
-                this.addOrderLineData = []
-              } else {
-                Message.error(res.msg)
+                this.dialogHeadVisible = false
               }
-            }).catch(e => {
-              Message.error(e)
             })
-          }).catch(e => {
-            Message.error(e)
+            this.loading = false
+          }, 500)
+        } else {
+          this.$refs.outboundOrderAdd.$refs.outboundOrderForm.validate((valid) => {
+            if (valid) {
+              saveOrUpdateOutboundHead(this.form).then(res => {
+                headId = res.data
+                for (let t of this.addOrderLineData) {
+                  t.headId = headId
+                }
+                deleteOutboundOrderLinesByHeadId(headId).then(res => {
+                  saveOrUpdateOutboundOrderLineList(this.addOrderLineData).then(res => {
+                    if (res.code == 200) {
+                      Message.success(res.msg)
+                      this.dialogHeadVisible = false
+                      this.initData()
+                      this.form = {}
+                      this.addOrderLineData = []
+                    } else {
+                      Message.error(res.msg)
+                    }
+                  }).catch(e => {
+                    Message.error(e)
+                  })
+                }).catch(e => {
+                  Message.error(e)
+                })
+              }).catch(e => {
+                Message.error(e)
+              })
+            } else {
+              console.log('error submit!!');
+              return false;
+            }
           })
-        }).catch(e => {
-          Message.error(e)
-        })
+        }
       },
       deleteHeadOrder(item) {
         this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
@@ -292,6 +313,16 @@
             message: '已取消删除'
           })
         })
+      },
+      outboundOrderAdd() {
+        this.dialogHeadVisible = true
+        this.searchFlag = false
+      },
+      searchOutbound() {
+        //查询
+        this.dialogHeadVisible = true
+        this.searchFlag = true
+        this.dialogTitle = '出库单查询'
       }
     }
   }

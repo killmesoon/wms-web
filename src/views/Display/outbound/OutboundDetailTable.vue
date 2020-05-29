@@ -23,9 +23,9 @@
                 </el-table-column>
                 <el-table-column prop="advLotCode" label="行号">
                 </el-table-column>
-                <el-table-column prop="advLotCode" label="物料编码">
+                <el-table-column prop="itemCode" label="物料编码">
                 </el-table-column>
-                <el-table-column prop="advLotCode" label="物料描述">
+                <el-table-column prop="itemDesc" label="物料描述">
                 </el-table-column>
                 <el-table-column prop="advWarehouseName" label="建议仓库">
                 </el-table-column>
