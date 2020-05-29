@@ -64,36 +64,37 @@
         <el-dialog :visible.sync="dialogLineOrderVisible" width="55%"
                    :close-on-click-modal="isClose">
             <div slot="title" class="dialog-head"><span>行信息录入</span></div>
-            <el-form :model="formLine" size="small" label-position="left" :inline="isFormInline">
+            <el-form :model="formLine" size="small" label-position="left" ref="outboundLineForm" :inline="isFormInline">
                 <el-form-item label="行号" :label-width="formLabelWidth">
                     <el-input v-model="formLine.lineNum" autocomplete="off">
                     </el-input>
                 </el-form-item>
-                <el-form-item label="物料编码" :label-width="formLabelWidth">
-                    <el-select v-model="formLine.item" placeholder="请输入物料编码" value-key="itemId" filterable
-                               @change="itemCodeChange">
-                        <el-option v-for="item in itemList" :key="item.itemId" :label="item.itemCode" :value="item">
+                <el-form-item label="物料编码" prop="itemCode" :label-width="formLabelWidth" :rules="[{ required: true, message: '请选择物料编码', trigger: 'change' }]">
+                    <!--                    <el-select v-model="formLine.item" placeholder="请输入物料编码" value-key="itemId" filterable-->
+                    <!--                               v-popover:proFlag-->
+                    <!--                               >-->
+                    <!--&lt;!&ndash;                        @change="itemCodeChange"&ndash;&gt;-->
+                    <!--                        <el-option v-for="item in itemList" :key="item.itemId" :label="item.itemCode" :value="item">-->
+                    <!--                        </el-option>-->
 
-                        </el-option>
-                    </el-select>
+                    <!--                    </el-select>-->
+                    <el-input v-model="formLine.itemCode" autocomplete="off" :disabled="disable"  v-popover:proFlag></el-input>
                 </el-form-item>
                 <el-form-item label="物料描述" :label-width="formLabelWidth">
-                    <el-input v-model="formLine.description" readonly="readonly" autocomplete="off">
+                    <el-input v-model="formLine.description" :disabled="disable" autocomplete="off">
                     </el-input>
                 </el-form-item>
-                <el-form-item label="仓库编码" :label-width="formLabelWidth">
-                    <el-select v-model="formLine.wareHouse" placeholder="请输入仓库编码" filterable value-key="warehouseId"
+                <el-form-item label="仓库编码" prop="wareHouse.warehouseCode" :rules="[{ required: true, message: '请选择', trigger: 'change' }]" :label-width="formLabelWidth">
+                    <el-select v-model="formLine.wareHouse"  placeholder="请输入仓库编码" filterable value-key="warehouseId"
                                @change="wareHouseCodeChange">
-                        <el-option v-for="item in wareHouseList" :key="item.warehouseId" :label="item.warehouseCode"
-                                   :value="item">
+                        <el-option v-for="wareHouse in wareHouseList" :key="wareHouse.warehouseId" :label="wareHouse.warehouseCode"
+                                   :value="wareHouse">
 
                         </el-option>
                     </el-select>
                 </el-form-item>
-            </el-form>
-            <el-form :model="formLine" size="small" label-position="left" :inline="isFormInline">
                 <el-form-item label="仓库名称" :label-width="formLabelWidth">
-                    <el-input v-model="formLine.warehouseName" readonly="readonly" autocomplete="off">
+                    <el-input v-model="formLine.warehouseName" :disabled="disable" autocomplete="off">
                     </el-input>
                 </el-form-item>
                 <el-form-item label="来源单据类型" :label-width="formLabelWidth">
@@ -102,7 +103,7 @@
                                    :value="item.dicId"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="单位" :label-width="formLabelWidth">
+                <el-form-item label="单位" prop="uom" :rules="[{ required: true, message: '请选择单位', trigger: 'change' }]" :label-width="formLabelWidth">
                     <el-select v-model="formLine.uom" filterable placeholder="请选择单位">
                         <el-option v-for="item in uomList" :key="item.uomId" :label="item.uomCode"
                                    :value="item.uomCode">
@@ -110,11 +111,9 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="计划数量" :label-width="formLabelWidth">
-                    <el-input v-model="formLine.planQty" autocomplete="off"></el-input>
+                <el-form-item label="计划数量" prop="planQty" :rules="[{ required: true, message: '请输入计划数量', trigger: 'blur' }]" :label-width="formLabelWidth">
+                    <el-input v-model="formLine.planQty"  autocomplete="off"></el-input>
                 </el-form-item>
-            </el-form>
-            <el-form :model="formLine" size="small" label-position="left" :inline="isFormInline">
                 <el-form-item label="来源单据行号" :label-width="formLabelWidth">
                     <el-input v-model="formLine.sourceLineNum" autocomplete="off"></el-input>
                 </el-form-item>
@@ -125,6 +124,15 @@
                     <el-input v-model="formLine.note" autocomplete="off"></el-input>
                 </el-form-item>
             </el-form>
+            <el-popover
+                    ref="proFlag"
+                    placement="right"
+                    trigger="click">
+                <el-table :data="gridData" highlight-current-row @current-change="handleCurrentChange">
+                    <el-table-column width="150" property="itemCode" label="物料编码"></el-table-column>
+                    <el-table-column width="100" property="oldCode" label="物料名称"></el-table-column>
+                </el-table>
+            </el-popover>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="cancelAdd">取 消</el-button>
                 <el-button type="primary" @click="addSingleLine">确 定</el-button>
@@ -156,6 +164,7 @@
         loading: false,
         tableData: [],
         tableHeight: 100,
+        disable: true,
         listQuery: {
           page: 1,
           limit: 20,
@@ -174,8 +183,11 @@
         wareHouseList: [],
         uomList: [],
         applyToBody: true,
-        formLine: {},
-        addOrderLineData: []
+        formLine: {
+          wareHouse: {}
+        },
+        addOrderLineData: [],
+        gridData: []
       }
     },
     created() {
@@ -186,6 +198,7 @@
       }, {}).then(res => {
         if (res.code == 200) {
           this.itemList = res.data.records
+          this.gridData = res.data.records
         } else {
           Message.error(res.msg)
         }
@@ -265,7 +278,9 @@
         this.initData()
       },
       lineAdd() {
-        this.formLine = {}
+        this.formLine = {
+          wareHouse: {}
+        }
         this.dialogLineOrderVisible = true
       },
       itemCodeChange(e) {
@@ -280,20 +295,29 @@
       },
       cancelAdd() {
         this.dialogLineOrderVisible = false
-        this.formLine = {}
+        this.formLine = {
+          wareHouse: {}
+        }
       },
       addSingleLine() {
         this.formLine.headId = this.outboundHeadIdFlag
-        saveOrUpdateOutboundOrderLine(this.formLine).then(res => {
-          if (res.code == 200) {
-            Message.success(res.msg)
-            this.dialogLineOrderVisible = false
-            this.initData()
-          } else {
-            Message.error(res.msg)
+        this.$refs.outboundLineForm.validate((valid) => {
+          if (valid) {
+            saveOrUpdateOutboundOrderLine(this.formLine).then(res => {
+              if (res.code == 200) {
+                Message.success(res.msg)
+                this.dialogLineOrderVisible = false
+                this.initData()
+                this.formLine = {
+                  wareHouse: {}
+                }
+              } else {
+                Message.error(res.msg)
+              }
+            }).catch(e => {
+              Message.error(e)
+            })
           }
-        }).catch(e => {
-          Message.error(e)
         })
       },
       deleteLine(item) {
@@ -318,7 +342,13 @@
             })
           })
         })
-      }
+      },
+      handleCurrentChange(val) {
+        this.$set(this.formLine, 'description',val.description)
+        this.$set(this.formLine, 'itemCode', val.itemCode)
+        this.$set(this.formLine, 'itemId', val.itemId)
+        this.$refs.proFlag.doClose()
+      },
     },
     computed: {
       ...mapGetters([
