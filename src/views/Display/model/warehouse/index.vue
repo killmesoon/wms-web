@@ -1,5 +1,5 @@
 <template>
-    <div style="position: relative;">
+    <div ref="mainContent" class="main-content">
         <DatePeriodSelect :default-period-date="selectedDate" :clearable="false" class="filter-item"
                           @getSelectedDate="getSelectedDate"/>
         <el-select v-model="listQuery.selectApplication" placeholder="请选择工厂">
@@ -77,7 +77,7 @@
                     @pagination="initData"
             />
         </div>
-        <el-dialog :visible.sync="dialogVisible" width="50%" :close-on-click-modal="closeFlag">
+        <el-dialog :visible.sync="dialogVisible" width="55%" :close-on-click-modal="closeFlag">
             <div slot="title" class="dialog-head">{{dialogTitle}}</div>
             <warehouse-dialog :data="form" :flag="searchFlag" ref="warehouseDialog"></warehouse-dialog>
             <div slot="footer">
@@ -89,220 +89,229 @@
 </template>
 
 <script>
-    import DatePeriodSelect from '@/components/Search/DatePeriodSelect'
-    import KeyWordSearch from '@/components/Search/KeyWordSearch'
-    import Pagination from '@/components/Pagination'
-    import {Message} from 'element-ui'
-    import {
-        getWareHouseList,
-        saveOrUpdateWarehouse,
-        deleteWarehouseList, deleteWarehouseById
-    } from '../../../../api/model/warehouse'
-    import WarehouseDialog from '../area/WarehouseDialog'
+  import DatePeriodSelect from '@/components/Search/DatePeriodSelect'
+  import KeyWordSearch from '@/components/Search/KeyWordSearch'
+  import Pagination from '@/components/Pagination'
+  import { Message } from 'element-ui'
+  import {
+    getWareHouseList,
+    saveOrUpdateWarehouse,
+    deleteWarehouseList, deleteWarehouseById
+  } from '../../../../api/model/warehouse'
+  import WarehouseDialog from '../area/WarehouseDialog'
 
-    export default {
-        name: 'index',
-        components: {
-            WarehouseDialog,
-            DatePeriodSelect,
-            Pagination,
-            KeyWordSearch
+  export default {
+    name: 'index',
+    components: {
+      WarehouseDialog,
+      DatePeriodSelect,
+      Pagination,
+      KeyWordSearch
+    },
+    data() {
+      return {
+        closeFlag: false,
+        tableData: [],
+        plantList: [
+          {
+            id: 1,
+            plantId: 1,
+            plantName: '上海外高桥一场',
+            plantCode: 'WGQ1'
+          },
+          {
+            id: 2,
+            plantId: 2,
+            plantName: '上海外高桥二场',
+            plantCode: 'WGQ2'
+          }
+        ],
+        listQuery: {
+          page: 1,
+          limit: 20,
+          offset: 0,
+          selectOperationType: '',
+          selectApplication: '',
+          startTime: '',
+          endTime: ''
         },
-        data() {
-            return {
-                closeFlag: false,
-                tableData: [],
-                plantList: [
-                    {
-                        id: 1,
-                        plantId: 1,
-                        plantName: '上海外高桥一场',
-                        plantCode: 'WGQ1'
-                    },
-                    {
-                        id: 2,
-                        plantId: 2,
-                        plantName: '上海外高桥二场',
-                        plantCode: 'WGQ2'
-                    }
-                ],
-                listQuery: {
-                    page: 1,
-                    limit: 20,
-                    offset: 0,
-                    selectOperationType: '',
-                    selectApplication: '',
-                    startTime: '',
-                    endTime: ''
-                },
-                total: 4,
-                dialogVisible: false,
-                dialogTitle: '新增仓库',
-                form: {},
-                tableHeight: 500,
-                searchFlag: false
+        total: 4,
+        dialogVisible: false,
+        dialogTitle: '新增仓库',
+        form: {},
+        tableHeight: 500,
+        searchFlag: false
+      }
+    },
+    created() {
+      this.initTime()
+    },
+    methods: {
+      initTime() {
+        this.listQuery.startTime = this.$moment().subtract('days', 30).format('YYYY-MM-DD')
+        this.listQuery.endTime = this.$moment().format('YYYY-MM-DD')
+        this.selectedDate = [this.listQuery.startTime, this.listQuery.endTime]
+        this.initData()
+      },
+      initData() {
+        const that = this
+        this.loading = true
+        setTimeout(() => {
+          getWareHouseList({
+            current: this.listQuery.page,
+            size: this.listQuery.limit
+          }, {}).then(res => {
+            if (res.code == 200) {
+              that.tableData = res.data.records
+              this.total = res.data.total
+              that.loading = false
+            } else {
+              Message.error(res.msg)
             }
-        },
-        created() {
-            this.initTime()
-        },
-        methods: {
-            initTime() {
-                this.listQuery.startTime = this.$moment().subtract('days', 30).format('YYYY-MM-DD')
-                this.listQuery.endTime = this.$moment().format('YYYY-MM-DD')
-                this.selectedDate = [this.listQuery.startTime, this.listQuery.endTime]
-                this.initData()
-            },
-            initData() {
-                const that = this
-                this.loading = true
-                setTimeout(() => {
-                    getWareHouseList({
-                        current: this.listQuery.page,
-                        size: this.listQuery.limit
-                    }, {}).then(res => {
-                        if (res.code == 200) {
-                            that.tableData = res.data.records
-                            this.total = res.data.total
-                            that.loading = false
-                        } else {
-                            Message.error(res.msg)
-                        }
-                    }).catch(e => {
-                        Message.error(e)
-                    })
-                }, 500)
-            },
+          }).catch(e => {
+            Message.error(e)
+          })
+        }, 500)
+      },
 
-            supplierAdd() {
-                this.dialogVisible = true
-                this.form = {}
-                this.searchFlag = false
-            },
-            cancelAdd() {
-                this.dialogVisible = false
-                this.form = {}
-            },
-            confirmSubmit() {
-                let t = JSON.parse(JSON.stringify(this.$refs.warehouseDialog.form))
-                this.form = t
-                if (this.form.negativeFlag != null) {
-                    this.form.negativeFlag = parseInt(this.form.negativeFlag)
-                }
-                if (this.form.panrangeFlag != null) {
-                    this.form.panrangeFlag = parseInt(this.form.panrangeFlag)
-                }
-                if (this.form.enableFlag != null) {
-                    this.form.enableFlag = parseInt(this.form.enableFlag)
-                }
-                if (this.searchFlag) {
-                    getWareHouseList({
-                        current: this.listQuery.page,
-                        size: this.listQuery.limit
-                    }, this.form).then(res => {
-                        if (res.code == 200) {
-                            this.tableData = res.data.records
-                            this.total = res.data.total
-                            this.dialogVisible = false
-                        } else {
-                            Message.error(res.msg)
-                        }
-                    }).catch(e => {
-                        Message.error(e)
-                    })
-                } else {
-                    saveOrUpdateWarehouse(this.form).then(res => {
-                        if (res.code == 200) {
-                            Message.success(res.msg)
-                            this.form = {}
-                            this.dialogVisible = false
-                            this.initData()
-                        } else {
-                            Message.error(res.msg)
-                        }
-                    }).catch(e => {
-                        Message.error(e)
-                    })
-                }
-            },
-            /**
-             * @description: 获取时间区间
-             * @param date 时间范围
-             */
-            getSelectedDate(date) {
-                this.listQuery.startTime = date[0]
-                this.listQuery.endTime = date[1]
-                this.initData()
-            },
-            deleteOrderList() {
-                //批量删除
-                let selectList = this.$refs.table.selection
-                let headIdList = [] //初始化headIdList
-                for (let t of selectList) {
-                    headIdList.push(t.warehouseId)
-                }
-                this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then(() => {
-                    deleteWarehouseList(headIdList).then(res => {
-                        if (res.code == 200) {
-                            Message.success('删除成功')
-                            this.initData()
-                        } else {
-                            Message.error(res.msg)
-                        }
-                    }).catch(e => {
-                        Message.error(e)
-                    })
-                }).catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '已取消删除'
-                    })
-                })
-            },
-            deleteSupplier(data) {
-                this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then(() => {
-                    deleteWarehouseById(data.warehouseId).then(res => {
-                        if (res.code == 200) {
-                            Message.success(res.msg)
-                            this.initData()
-                        } else {
-                            Message.error(res.msg)
-                        }
-                    })
-                }).catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '已取消删除'
-                    })
-                })
-            },
-            searchData() {
-                this.form = {}
-                this.dialogVisible = true
-                this.searchFlag = true
-                this.dialogTitle = '仓库查询'
-            },
-            editSupplier(data) {
-                this.searchFlag = false
-                this.dialogVisible = true
-                this.form = JSON.parse(JSON.stringify(data))
-                this.form.enableFlag = this.form.enableFlag ? '1' : '0'
-                this.form.negativeFlag = this.form.negativeFlag ? '1' : '0'
-                this.form.panrangeFlag = this.form.panrangeFlag ? '1' : '0'
-                this.dialogTitle = '编辑仓库'
-            }
+      supplierAdd() {
+        this.dialogVisible = true
+        this.form = {}
+        this.searchFlag = false
+      },
+      cancelAdd() {
+        this.dialogVisible = false
+        this.form = {}
+      },
+      confirmSubmit() {
+        let t = JSON.parse(JSON.stringify(this.$refs.warehouseDialog.form))
+        this.form = t
+        if (this.form.negativeFlag != null) {
+          this.form.negativeFlag = parseInt(this.form.negativeFlag)
         }
+        if (this.form.panrangeFlag != null) {
+          this.form.panrangeFlag = parseInt(this.form.panrangeFlag)
+        }
+        if (this.form.enableFlag != null) {
+          this.form.enableFlag = parseInt(this.form.enableFlag)
+        }
+        if (this.searchFlag) {
+            getWareHouseList({
+                current: this.listQuery.page,
+                size: this.listQuery.limit
+            }, this.form).then(res => {
+                if (res.code == 200) {
+                    this.tableData = res.data.records
+                    this.total = res.data.total
+                    this.dialogVisible = false
+                } else {
+                    Message.error(res.msg)
+                }
+            }).catch(e => {
+                Message.error(e)
+            })
+        } else {
+          this.$refs.warehouseDialog.$refs.warehouseForm.validate((valid) => {
+            if (valid) {
+              saveOrUpdateWarehouse(this.form).then(res => {
+                if (res.code == 200) {
+                  Message.success(res.msg)
+                  this.form = {}
+                  this.dialogVisible = false
+                  this.initData()
+                } else {
+                  Message.error(res.msg)
+                }
+              }).catch(e => {
+                Message.error(e)
+              })
+            } else {
+              return false
+            }
+          })
+        }
+      },
+      /**
+       * @description: 获取时间区间
+       * @param date 时间范围
+       */
+      getSelectedDate(date) {
+        this.listQuery.startTime = date[0]
+        this.listQuery.endTime = date[1]
+        this.initData()
+      },
+      deleteOrderList() {
+        //批量删除
+        let selectList = this.$refs.table.selection
+        let headIdList = [] //初始化headIdList
+        for (let t of selectList) {
+          headIdList.push(t.warehouseId)
+        }
+        this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteWarehouseList(headIdList).then(res => {
+            if (res.code == 200) {
+              Message.success('删除成功')
+              this.initData()
+            } else {
+              Message.error(res.msg)
+            }
+          }).catch(e => {
+            Message.error(e)
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+      },
+      deleteSupplier(data) {
+        this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteWarehouseById(data.warehouseId).then(res => {
+            if (res.code == 200) {
+              Message.success(res.msg)
+              this.initData()
+            } else {
+              Message.error(res.msg)
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+      },
+      searchData() {
+        this.form = {}
+        this.dialogVisible = true
+        this.searchFlag = true
+        this.dialogTitle = '仓库查询'
+      },
+      editSupplier(data) {
+        this.searchFlag = false
+        this.dialogVisible = true
+        this.form = JSON.parse(JSON.stringify(data))
+        this.form.enableFlag = this.form.enableFlag ? '1' : '0'
+        this.form.negativeFlag = this.form.negativeFlag ? '1' : '0'
+        this.form.panrangeFlag = this.form.panrangeFlag ? '1' : '0'
+        this.dialogTitle = '编辑仓库'
+      }
     }
+  }
 </script>
 
 <style scoped>
-
+    .main-content {
+        background: white;
+        height: calc(100vh - 84px);
+    }
 </style>
