@@ -194,29 +194,37 @@
         }
       },
       confirmSubmit() {
-        this.$refs.dialogData.$refs.locatorForm.validate((valid) => {
-          if (valid) {
-            let form = JSON.parse(JSON.stringify(this.$refs.dialogData.form))
-            this.form = form
-            if (this.form.enableFlag != null) {
-              this.form.enableFlag = parseInt(this.form.enableFlag)
-            }
-            if (this.searchFlag) {
-              queryLocatorList({
-                current: this.listQuery.page,
-                size: this.listQuery.limit
-              }, this.form).then(res => {
-                if (res.code == 200) {
-                  this.tableData = res.data.records
-                  this.total = res.data.total
-                  this.dialogVisible = false
-                } else {
-                  Message.error(res.msg)
-                }
-              }).catch(e => {
-                Message.error(e)
-              })
+        if (this.searchFlag) {
+          let t = JSON.parse(JSON.stringify(this.$refs.dialogData.form))
+          this.form = t
+          if (this.form.enableFlag != null) {
+            this.form.enableFlag = parseInt(this.form.enableFlag)
+          }
+          if (this.form.locatorType != null) {
+            this.form.locatorType = parseInt(this.form.locatorType)
+          }
+          queryLocatorList({
+            current: this.listQuery.page,
+            size: this.listQuery.limit
+          }, this.form).then(res => {
+            if (res.code == 200) {
+              this.tableData = res.data.records
+              this.total = res.data.total
+              this.dialogVisible = false
             } else {
+              Message.error(res.msg)
+            }
+          }).catch(e => {
+            Message.error(e)
+          })
+        } else {
+          this.$refs.dialogData.$refs.locatorForm.validate((valid) => {
+            if (valid) {
+              let form = JSON.parse(JSON.stringify(this.$refs.dialogData.form))
+              this.form = form
+              if (this.form.enableFlag != null) {
+                this.form.enableFlag = parseInt(this.form.enableFlag)
+              }
               saveOrUpdateLocator(this.form).then(res => {
                 if (res.code == 200) {
                   Message.success(res.msg)
@@ -232,11 +240,11 @@
               }).catch(e => {
                 Message.error(e)
               })
+            } else {
+              return false
             }
-          } else {
-            return false
-          }
-        })
+          })
+        }
       },
       /**
        * @description: 获取时间区间
