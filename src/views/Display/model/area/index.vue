@@ -1,19 +1,21 @@
 <template>
     <div ref="mainContent" class="main-content">
-        <DatePeriodSelect :default-period-date="selectedDate" :clearable="false" class="filter-item"
-                          @getSelectedDate="getSelectedDate"/>
-        <el-select v-model="listQuery.selectApplication" placeholder="请选择工厂">
-            <el-option
-                    v-for="item in plantList"
-                    :key="item.plantId"
-                    :label="item.plantName"
-                    :value="item.plantId"
-            />
-        </el-select>
+        <!--        <DatePeriodSelect :default-period-date="selectedDate" :clearable="false" class="filter-item"-->
+        <!--                          @getSelectedDate="getSelectedDate"/>-->
+        <!--        <el-select v-model="listQuery.selectApplication" placeholder="请选择工厂">-->
+        <!--            <el-option-->
+        <!--                    v-for="item in plantList"-->
+        <!--                    :key="item.plantId"-->
+        <!--                    :label="item.plantName"-->
+        <!--                    :value="item.plantId"-->
+        <!--            />-->
+        <!--        </el-select>-->
         <!--      <KeyWordSearch input-width="360px" place-holder="支持账户名、显示名称、手机号、邮箱快速搜索" @search="getSearchData" />-->
-        <el-button type="primary" icon="el-icon-plus" @click="supplierAdd"> 录入</el-button>
-        <el-button type="danger" icon="el-icon-delete" @click="deleteOrderList"> 批量删除</el-button>
-        <el-button type="primary" icon="el-icon-search" @click="searchData"> 查询</el-button>
+
+        <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteOrderList"> 批量删除</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-plus" @click="supplierAdd"> 录入</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-search" @click="searchData"> 查询</el-button>
+
         <div>
             <el-table
                     ref="table"
@@ -29,9 +31,9 @@
                         type="selection"
                         width="30">
                 </el-table-column>
-                <el-table-column prop="warehouseCode" label="工厂编码">
+                <el-table-column prop="plantCode" label="工厂编码">
                 </el-table-column>
-                <el-table-column prop="warehouseCode" label="工厂名称">
+                <el-table-column prop="plantName" label="工厂名称">
                 </el-table-column>
                 <el-table-column prop="warehouseCode" label="仓库编码">
                 </el-table-column>
@@ -43,7 +45,7 @@
                 </el-table-column>
                 <el-table-column prop="areaTypeDic" label="区域类型">
                 </el-table-column>
-                <el-table-column prop="enableFlag" label="是否有效">
+                <el-table-column prop="enableFlag" align="center" label="是否有效">
                     <template slot-scope="scope">
                         {{scope.row.enableFlag ? 'Y' : 'N'}}
                     </template>
@@ -71,7 +73,7 @@
                     @pagination="initData"
             />
         </div>
-        <el-dialog :visible.sync="dialogVisible" width="50%" :close-on-click-modal="closeFlag">
+        <el-dialog :visible.sync="dialogVisible" width="50%" :close-on-click-modal="closeFlag" @close="resetAll">
             <div slot="title" class="dialog-head">{{dialogTitle}}</div>
             <area-dialog :data="form" :flag="searchFlag" ref="dialogArea"></area-dialog>
             <div slot="footer">
@@ -171,19 +173,12 @@
       },
       supplierAdd() {
         this.dialogVisible = true
-        this.form = {
-          wareHouse: {},
-          area: {}
-        }
+        this.form = {}
         this.dialogTitle = '新增区域'
         this.searchFlag = false
       },
       cancelAdd() {
         this.dialogVisible = false
-        this.form = {
-          wareHouse: {},
-          area: {}
-        }
       },
       confirmSubmit() {
         // console.log(this.$refs.dialogData.form)
@@ -201,6 +196,7 @@
               this.tableData = res.data.records
               this.total = res.data.total
               this.dialogVisible = false
+              this.form = {}
             } else {
               Message.error(res.msg)
             }
@@ -290,9 +286,7 @@
         })
       },
       searchData() {
-        this.form = {
-          wareHouse: {}
-        }
+        this.form = {}
         this.dialogVisible = true
         this.searchFlag = true
         this.dialogTitle = '区域查询'
@@ -301,8 +295,17 @@
         this.searchFlag = false
         this.dialogVisible = true
         this.form = JSON.parse(JSON.stringify(data))
+        // this.$set(this.form, 'wareHouse', {
+        //   warehouseCode: data.warehouseCode
+        // })
         this.form.enableFlag = this.form.enableFlag ? '1' : '0'
         this.dialogTitle = '编辑区域'
+      },
+      resetAll() {
+        if (!this.searchFlag) {
+          this.$refs.dialogArea.$refs.areaForm.resetFields()
+        }
+        this.form = {}
       }
     }
   }
@@ -312,5 +315,11 @@
     .main-content {
         background: white;
         height: calc(100vh - 84px);
+        padding: 10px;
+    }
+
+    .main-content > .el-button {
+        float: right;
+        margin-right: 3px;
     }
 </style>
