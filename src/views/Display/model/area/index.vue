@@ -209,9 +209,7 @@
               saveOrUpdateWarehouseAreaList(this.form).then(res => {
                 if (res.code == 200) {
                   Message.success(res.msg)
-                  this.form = {
-                    wareHouse: {}
-                  }
+                  this.form = {}
                   this.dialogVisible = false
                   this.initData()
                 } else {
