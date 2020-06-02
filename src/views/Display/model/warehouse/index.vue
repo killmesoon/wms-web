@@ -1,19 +1,21 @@
 <template>
     <div ref="mainContent" class="main-content">
-        <DatePeriodSelect :default-period-date="selectedDate" :clearable="false" class="filter-item"
-                          @getSelectedDate="getSelectedDate"/>
-        <el-select v-model="listQuery.selectApplication" placeholder="请选择工厂">
-            <el-option
-                    v-for="item in plantList"
-                    :key="item.plantId"
-                    :label="item.plantName"
-                    :value="item.plantId"
-            />
-        </el-select>
+<!--        <DatePeriodSelect :default-period-date="selectedDate" :clearable="false" class="filter-item"-->
+<!--                          @getSelectedDate="getSelectedDate"/>-->
+<!--        <el-select v-model="listQuery.selectApplication" placeholder="请选择工厂">-->
+<!--            <el-option-->
+<!--                    v-for="item in plantList"-->
+<!--                    :key="item.plantId"-->
+<!--                    :label="item.plantName"-->
+<!--                    :value="item.plantId"-->
+<!--            />-->
+<!--        </el-select>-->
         <!--      <KeyWordSearch input-width="360px" place-holder="支持账户名、显示名称、手机号、邮箱快速搜索" @search="getSearchData" />-->
-        <el-button type="primary" icon="el-icon-plus" @click="supplierAdd"> 录入</el-button>
-        <el-button type="danger" icon="el-icon-delete" @click="deleteOrderList"> 批量删除</el-button>
-        <el-button type="primary" icon="el-icon-search" @click="searchData"> 查询</el-button>
+
+
+        <el-button type="danger"  size="mini" icon="el-icon-delete"  @click="deleteOrderList"> 批量删除</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-plus"  @click="supplierAdd"> 录入</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-search"  @click="searchData"> 查询</el-button>
         <div>
             <el-table
                     ref="table"
@@ -29,9 +31,9 @@
                         type="selection"
                         width="30">
                 </el-table-column>
-                <el-table-column prop="warehouseCode" label="工厂编码">
+                <el-table-column prop="plantCode" label="工厂编码">
                 </el-table-column>
-                <el-table-column prop="warehouseCode" label="工厂简称">
+                <el-table-column prop="plantName" label="工厂简称">
                 </el-table-column>
                 <el-table-column prop="warehouseCode" label="仓库编码">
                 </el-table-column>
@@ -39,17 +41,17 @@
                 </el-table-column>
                 <el-table-column prop="warehouseTypeDic" label="仓库类型">
                 </el-table-column>
-                <el-table-column prop="negativeFlag" label="允许负库存">
+                <el-table-column prop="negativeFlag" align="center" label="允许负库存">
                     <template slot-scope="scope">
                         {{scope.row.negativeFlag ? 'Y' : 'N'}}
                     </template>
                 </el-table-column>
-                <el-table-column prop="disFlag" label="是否参与盘点">
+                <el-table-column prop="disFlag" align="center" label="是否参与盘点">
                     <template slot-scope="scope">
                         {{scope.row.panrangeFlag ? 'Y' : 'N'}}
                     </template>
                 </el-table-column>
-                <el-table-column prop="enableFlag" label="是否有效">
+                <el-table-column prop="enableFlag" align="center" label="是否有效">
                     <template slot-scope="scope">
                         {{scope.row.enableFlag ? 'Y' : 'N'}}
                     </template>
@@ -77,8 +79,7 @@
                     @pagination="initData"
             />
         </div>
-        <el-dialog :visible.sync="dialogVisible" width="55%" :close-on-click-modal="closeFlag">
-            <div slot="title" class="dialog-head">{{dialogTitle}}</div>
+        <el-dialog :visible.sync="dialogVisible" :title="dialogTitle" width="55%" @close="resetAll" :close-on-click-modal="closeFlag">
             <warehouse-dialog :data="form" :flag="searchFlag" ref="warehouseDialog"></warehouse-dialog>
             <div slot="footer">
                 <el-button @click="cancelAdd">取 消</el-button>
@@ -96,7 +97,8 @@
   import {
     getWareHouseList,
     saveOrUpdateWarehouse,
-    deleteWarehouseList, deleteWarehouseById
+    deleteWarehouseList, deleteWarehouseById,
+    deleteFlag
   } from '../../../../api/model/warehouse'
   import WarehouseDialog from '../area/WarehouseDialog'
 
@@ -116,14 +118,8 @@
           {
             id: 1,
             plantId: 1,
-            plantName: '上海外高桥一场',
+            plantName: '上海外高桥一厂',
             plantCode: 'WGQ1'
-          },
-          {
-            id: 2,
-            plantId: 2,
-            plantName: '上海外高桥二场',
-            plantCode: 'WGQ2'
           }
         ],
         listQuery: {
@@ -275,12 +271,18 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          deleteWarehouseById(data.warehouseId).then(res => {
-            if (res.code == 200) {
-              Message.success(res.msg)
-              this.initData()
-            } else {
-              Message.error(res.msg)
+          deleteFlag(data.warehouseId).then(res => {
+            if (res.data) {
+              deleteWarehouseById(data.warehouseId).then(res => {
+                if (res.code == 200) {
+                  Message.success(res.msg)
+                  this.initData()
+                } else {
+                  Message.error(res.msg)
+                }
+              }).catch(e => {
+                Message.error(e)
+              })
             }
           })
         }).catch(() => {
@@ -304,6 +306,11 @@
         this.form.negativeFlag = this.form.negativeFlag ? '1' : '0'
         this.form.panrangeFlag = this.form.panrangeFlag ? '1' : '0'
         this.dialogTitle = '编辑仓库'
+      },
+      resetAll() {
+        if (!this.searchFlag) {
+          this.$refs.warehouseDialog.$refs.warehouseForm.resetFields()
+        }
       }
     }
   }
@@ -313,5 +320,10 @@
     .main-content {
         background: white;
         height: calc(100vh - 84px);
+        padding: 10px;
+    }
+    .main-content > .el-button {
+        margin-right: 3px;
+        float: right;
     }
 </style>

@@ -77,7 +77,7 @@
             <el-form-item v-else label="货位名称" :label-width="formLabelWidth" prop="locatorName" :rules="[{ required: true, message: '请输入货位名称', trigger: 'blur' }]">
                 <el-input v-model="form.locatorName" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item v-if="flag" label="货位类型" :label-width="formLabelWidth" prop="locatorType" >
+            <el-form-item v-if="searchFlag" label="货位类型" :label-width="formLabelWidth" prop="locatorType" >
                 <el-select v-model="form.locatorType" placeholder="请选择">
                     <el-option v-for="item in dicLocatorTypeList" :value="item.dicId" :key="item.dicId"
                                :label="item.dicName"></el-option>

@@ -1,5 +1,5 @@
 <template>
-    <div style="position: relative;">
+    <div ref="mainContent" class="main-content">
         <DatePeriodSelect :default-period-date="selectedDate" :clearable="false" class="filter-item"
                           @getSelectedDate="getSelectedDate"/>
         <el-select v-model="listQuery.selectApplication" placeholder="请选择工厂">
@@ -171,13 +171,19 @@
       },
       supplierAdd() {
         this.dialogVisible = true
-        this.form = {}
+        this.form = {
+          wareHouse: {},
+          area: {}
+        }
+        this.dialogTitle = '新增区域'
         this.searchFlag = false
-        this.dialogTitle = '新增货位'
       },
       cancelAdd() {
         this.dialogVisible = false
-        this.form = {}
+        this.form = {
+          wareHouse: {},
+          area: {}
+        }
       },
       confirmSubmit() {
         // console.log(this.$refs.dialogData.form)
@@ -202,17 +208,25 @@
             Message.error(e)
           })
         } else {
-          saveOrUpdateWarehouseAreaList(this.form).then(res => {
-            if (res.code == 200) {
-              Message.success(res.msg)
-              this.form = {}
-              this.dialogVisible = false
-              this.initData()
+          this.$refs.dialogArea.$refs.areaForm.validate((valid) => {
+            if (valid) {
+              saveOrUpdateWarehouseAreaList(this.form).then(res => {
+                if (res.code == 200) {
+                  Message.success(res.msg)
+                  this.form = {
+                    wareHouse: {}
+                  }
+                  this.dialogVisible = false
+                  this.initData()
+                } else {
+                  Message.error(res.msg)
+                }
+              }).catch(e => {
+                Message.error(e)
+              })
             } else {
-              Message.error(res.msg)
+              return false
             }
-          }).catch(e => {
-            Message.error(e)
           })
         }
       },
@@ -276,7 +290,9 @@
         })
       },
       searchData() {
-        this.form = {}
+        this.form = {
+          wareHouse: {}
+        }
         this.dialogVisible = true
         this.searchFlag = true
         this.dialogTitle = '区域查询'
@@ -293,5 +309,8 @@
 </script>
 
 <style scoped>
-
+    .main-content {
+        background: white;
+        height: calc(100vh - 84px);
+    }
 </style>

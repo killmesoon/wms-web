@@ -300,6 +300,7 @@
         this.dialogHeadVisible = false
         this.form = {}
         this.dialogTitle = '入库单录入'
+
       },
       /**
        * 插入或更新
@@ -397,11 +398,6 @@
         width: 143px;
     }
 
-    .el-dialog__header {
-        /*background-color: #027AFF;*/
-        background-color: #011C1D;
-        color: #fff;
-    }
 
     .dialog-head {
         height: 20px;

@@ -44,3 +44,14 @@ export function deleteWarehouseById(id) {
     method: 'get'
   })
 }
+
+/**
+ * 删除仓库前校验
+ * @param id
+ */
+export function deleteFlag(id) {
+  return request({
+    url: '/warehouse/wms-warehouse/warehouseDeleteFlag/'+ id,
+    method: 'get'
+  })
+}

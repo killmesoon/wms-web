@@ -1,5 +1,5 @@
 <template>
-    <div style="position: relative;">
+    <div ref="mainContent" class="main-content">
         <DatePeriodSelect :default-period-date="selectedDate" :clearable="false" class="filter-item"
                           @getSelectedDate="getSelectedDate"/>
         <el-select v-model="listQuery.selectApplication" placeholder="请选择工厂">
@@ -296,5 +296,8 @@
 </script>
 
 <style scoped>
-
+    .main-content {
+        background: white;
+        height: calc(100vh - 84px);
+    }
 </style>
