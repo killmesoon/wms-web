@@ -1,7 +1,7 @@
 <template>
     <div ref="mainContent" class="main-content">
         <div id="topView" ref="topView" class="top-view">
-            <outbound-head-table ref="outboundHeadTable"></outbound-head-table>
+            <outbound-head-table @notify="notifyLineData" ref="outboundHeadTable"></outbound-head-table>
         </div>
         <div ref="lineDiv" class="line-view"/>
 
@@ -117,6 +117,9 @@
             this.$refs.outboundLineTable.initTaleHeight()
           }
         })
+      },
+      notifyLineData() {
+        this.$refs.outboundLineTable.initData()
       }
 
     }
@@ -131,13 +134,13 @@
 
     .top-view {
         height: 50%;
-        padding: 20px;
+        padding: 10px;
         // overflow: auto;
     }
 
     .bottom-view {
         height: 50%;
-        padding: 20px;
+        padding: 10px;
         // overflow: auto;
     }
 

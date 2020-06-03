@@ -1,11 +1,10 @@
 <template>
     <div style="position: relative;">
-        <div>
-            <DatePeriodSelect :default-period-date="selectedDate" :clearable="false" class="filter-item" @getSelectedDate="getSelectedDate" />
+        <div class="detail-wrapper">
+<!--            <DatePeriodSelect :default-period-date="selectedDate" :clearable="false" class="filter-item" @getSelectedDate="getSelectedDate" />-->
 
             <!--      <KeyWordSearch input-width="360px" place-holder="支持账户名、显示名称、手机号、邮箱快速搜索" @search="getSearchData" />-->
-            <el-button type="primary" icon="el-icon-plus"> 录入</el-button>
-            <el-button type="danger" icon="el-icon-delete"> 批量删除</el-button>
+
         </div>
         <div>
             <el-table
@@ -191,5 +190,4 @@
 </script>
 
 <style scoped>
-
 </style>

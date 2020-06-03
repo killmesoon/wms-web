@@ -2,7 +2,7 @@
   <div ref="mainContent" class="main-content">
     <!-- <el-table ref="topView" /> -->
     <div id="topView" ref="topView" class="top-view">
-      <account-table ref="accountTable" />
+      <account-table @notify="notifyLineData" ref="accountTable" />
     </div>
     <div ref="lineDiv" class="line-view" />
     <!-- <el-table ref="bottomView" /> -->
@@ -117,8 +117,10 @@ export default {
           this.$refs.accountTable2.initTaleHeight()
         }
       })
+    },
+    notifyLineData() {
+      this.$refs.accountTable2.initData()
     }
-
   }
 }
 </script>
@@ -130,13 +132,13 @@ export default {
 
 .top-view {
   height: 50%;
-  padding: 20px;
+  padding: 10px;
   // overflow: auto;
 }
 
 .bottom-view {
   height: 50%;
-  padding: 20px;
+  padding: 10px;
   // overflow: auto;
 }
 

@@ -1,14 +1,12 @@
 <template>
     <div>
-        <el-form :model="form" size="small" ref="outboundOrderForm"  label-position="left" :inline="isFormInline">
-
+        <el-form :model="form" size="small" ref="outboundOrderForm"  label-position="right" :inline="isFormInline">
             <el-form-item v-if="flag" label="订单类型" :label-width="formLabelWidth" >
                 <el-select v-model="form.docType"  placeholder="请选择订单类型">
                     <el-option v-for="item in dicInboundOrderTypeList" :key="item.dicCode" :label="item.dicName"
                                :value="item.dicId"></el-option>
                 </el-select>
             </el-form-item>
-
             <el-form-item v-else label="订单类型" :label-width="formLabelWidth" :rules="[{ required: true, message: '请选择订单类型', trigger: 'change' }]" prop="docType">
                 <el-select v-model="form.docType"  placeholder="请选择订单类型">
                     <el-option v-for="item in dicInboundOrderTypeList" :key="item.dicCode" :label="item.dicName"
@@ -16,7 +14,7 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="订单号" :label-width="formLabelWidth">
-                <el-input v-model="form.docNumber" autocomplete="off"></el-input>
+                <el-input v-model="form.docNumber" type="number" placeholder="请输入订单号" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item v-if="flag" label="订单状态" :label-width="formLabelWidth" >
                 <el-select v-model="form.docStatus" placeholder="请选择订单状态">
@@ -30,7 +28,6 @@
                                :value="item.dicId"></el-option>
                 </el-select>
             </el-form-item>
-
             <el-form-item label="工厂编码" v-if="flag" :label-width="formLabelWidth">
                 <el-select v-model="form.plantId" placeholder="请选择工厂编码">
                     <el-option v-for="item in plantList" :key="item.id" :label="item.plantName"
@@ -50,7 +47,7 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="来源单据号" :label-width="formLabelWidth">
-                <el-input v-model="form.sourceDocNum" autocomplete="off"></el-input>
+                <el-input v-model="form.sourceDocNum" type="number" placeholder="请输入来源单据号" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item label="计划日期" :label-width="formLabelWidth">
                 <el-date-picker
@@ -62,7 +59,7 @@
                 </el-date-picker>
             </el-form-item>
             <el-form-item label="备注" :label-width="formLabelWidth">
-                <el-input v-model="form.note" autocomplete="off"></el-input>
+                <el-input v-model="form.note" placeholder="请输入备注" autocomplete="off"></el-input>
             </el-form-item>
         </el-form>
     </div>
@@ -84,14 +81,8 @@
           {
             id: 1,
             plantId: 1,
-            plantName: '上海外高桥一场',
+            plantName: '上海外高桥一厂',
             plantCode: 'WGQ1'
-          },
-          {
-            id: 2,
-            plantId: 2,
-            plantName: '上海外高桥二场',
-            plantCode: 'WGQ2'
           }
         ],
         //时间设置

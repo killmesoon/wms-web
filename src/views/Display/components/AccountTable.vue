@@ -1,20 +1,20 @@
 <template>
     <div style="position: relative;">
-        <div>
-            <DatePeriodSelect :default-period-date="selectedDate" :clearable="false" class="filter-item"
-                              @getSelectedDate="getSelectedDate"/>
-            <el-select v-model="listQuery.selectApplication" placeholder="请选择工厂">
-                <el-option
-                        v-for="item in plantList"
-                        :key="item.plantId"
-                        :label="item.plantName"
-                        :value="item.plantId"
-                />
-            </el-select>
+        <div class="head-wrapper">
+<!--            <DatePeriodSelect :default-period-date="selectedDate" :clearable="false" class="filter-item"-->
+<!--                              @getSelectedDate="getSelectedDate"/>-->
+<!--            <el-select v-model="listQuery.selectApplication" placeholder="请选择工厂">-->
+<!--                <el-option-->
+<!--                        v-for="item in plantList"-->
+<!--                        :key="item.plantId"-->
+<!--                        :label="item.plantName"-->
+<!--                        :value="item.plantId"-->
+<!--                />-->
+<!--            </el-select>-->
             <!--      <KeyWordSearch input-width="360px" place-holder="支持账户名、显示名称、手机号、邮箱快速搜索" @search="getSearchData" />-->
-            <el-button type="primary" icon="el-icon-plus" @click="inboundAdd"> 录入</el-button>
-            <el-button type="danger" icon="el-icon-delete" @click="deleteOrderList"> 批量删除</el-button>
-            <el-button type="primary" icon="el-icon-search" @click="searchInbound"> 查询</el-button>
+            <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteOrderList"> 批量删除</el-button>
+            <el-button type="primary" size="mini" icon="el-icon-plus" @click="inboundAdd"> 录入</el-button>
+            <el-button type="primary" size="mini" icon="el-icon-search" @click="searchInbound"> 查询</el-button>
         </div>
         <div>
             <el-table
@@ -40,18 +40,18 @@
                 </el-table-column>
                 <el-table-column prop="plantId" label="所在工厂">
                 </el-table-column>
-                <el-table-column prop="realSourceDocType" label="来源单据类型">
+                <el-table-column prop="realSourceDocType" width="120px" label="来源单据类型">
                 </el-table-column>
-                <el-table-column prop="sourceDocNum" label="来源单据号">
+                <el-table-column prop="sourceDocNum" width="120px" label="来源单据号">
                 </el-table-column>
                 <el-table-column prop="planTime" label="计划日期">
                 </el-table-column>
-                <el-table-column prop="rfidFlag" label="RFID同步">
+                <el-table-column prop="rfidFlag" align="center" label="RFID同步">
                     <template slot-scope="scope">
                         <div>{{scope.row.rfidFlag ? 'Y' : 'N'}}</div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="erpFlag" label="同步ERP">
+                <el-table-column prop="erpFlag" align="center" label="同步ERP">
                     <template slot-scope="scope">
                         <div>{{scope.row.erpFlag ? 'Y' : 'N'}}</div>
                     </template>
@@ -59,6 +59,7 @@
                 <el-table-column prop="note" label="备注">
                 </el-table-column>
                 <el-table-column
+                        align="center"
                         width="180"
                         label="操作">
                     <template slot-scope="scope">
@@ -77,12 +78,9 @@
                     @pagination="initData"
             />
         </div>
-        <el-dialog :visible.sync="dialogHeadVisible" width="50%" :close-on-click-modal="closeFlag">
-            <div slot="title" class="dialog-head">
-                <span>{{dialogTitle}}</span>
-            </div>
+        <el-dialog :visible.sync="dialogHeadVisible" :title="dialogTitle" width="50%" :close-on-click-modal="closeFlag" @close="resetAll">
             <inbound-order-add :form="form" :flag="searchFlag" ref="inboundOrderAdd"></inbound-order-add>
-            <inbound-line-add @event1="getFromSon" v-if="!searchFlag"></inbound-line-add>
+            <inbound-line-add @event1="getFromSon" v-if="!searchFlag"  :data="orderLineList"></inbound-line-add>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="cancelAdd">取 消</el-button>
                 <el-button type="primary" @click="confirmSubmit">确 定</el-button>
@@ -105,9 +103,11 @@
     saveOrUpdateInboundHead,
     deleteOrderLinesByHeadId,
     insertOrderLineList,
-    deleteInboundHeadList
+    deleteInboundHeadList,
+    getLineListByHeadId
   } from '../../../api/inbound'
   import { Message } from 'element-ui'
+  import {mapGetters} from 'vuex'
 
   export default {
     components: {
@@ -137,24 +137,11 @@
         },
         total: 4,
         // 应用列表 下拉框使用
-        plantList: [
-          {
-            id: 1,
-            plantId: 1,
-            plantName: '上海外高桥一场',
-            plantCode: 'WGQ1'
-          },
-          {
-            id: 2,
-            plantId: 2,
-            plantName: '上海外高桥二场',
-            plantCode: 'WGQ2'
-          }
-        ],
         form: {},
         dialogTitle: '入库单录入',
         formLine: {},
-        addOrderLineData: []
+        addOrderLineData: [],
+        orderLineList: []
       }
     },
 
@@ -201,8 +188,10 @@
               that.tableData = res.data.records
               this.total = res.data.total
               that.loading = false
-              let first = that.tableData[0]
-              this.$store.dispatch('inbound/setHeadId', first.headId)
+              if (this.headIdFlag == 0) {
+                let first = that.tableData[0]
+                this.$store.dispatch('inbound/setHeadId', first.headId)
+              }
             }
           })
           that.loading = false
@@ -298,9 +287,7 @@
        */
       cancelAdd() {
         this.dialogHeadVisible = false
-        this.form = {}
         this.dialogTitle = '入库单录入'
-
       },
       /**
        * 插入或更新
@@ -338,11 +325,14 @@
                   }
                   deleteOrderLinesByHeadId(headId).then(res => {
                     insertOrderLineList(this.addOrderLineData).then(res => {
-                      Message.success(res.msg)
                       this.dialogHeadVisible = false
-                      this.initData()
                       this.form = {}
                       this.addOrderLineData = []
+                      // this.initData()
+                      //通知行信息更新
+                      this.notifyLineData()
+                      // this.$store.dispatch('inbound/setHeadId', headId)
+                      Message.success(res.msg)
                     }).catch(e => {
                       Message.error(e)
                     })
@@ -365,12 +355,28 @@
        * @param data
        */
       editHeadOrder(data) {
-        this.dialogTitle = '入库单编辑'
-        this.form = JSON.parse(JSON.stringify(data))
-        this.form.docType = parseInt(data.docType)
-        this.form.docStatus = parseInt(data.docStatus)
-        this.form.sourceDocType = parseInt(data.sourceDocType)
-        this.dialogHeadVisible = true
+        //查询头关联的行信息
+        // this.$store.dispatch('inbound/setHeadId', data.headId)
+        getLineListByHeadId({
+          current:1,
+          size: -1
+        },data.headId).then(res => {
+          if (res.code == 200) {
+            let t = res.data.records
+            this.dialogTitle = '入库单编辑'
+            this.form = JSON.parse(JSON.stringify(data))
+            this.orderLineList = JSON.parse(JSON.stringify(t))
+            this.form.docType = parseInt(data.docType)
+            this.form.docStatus = parseInt(data.docStatus)
+            this.form.sourceDocType = parseInt(data.sourceDocType)
+            this.dialogHeadVisible = true
+
+          } else {
+            Message.error(res.msg)
+          }
+        }).catch(e => {
+          Message.error(e)
+        })
       },
       inboundAdd() {
         this.dialogHeadVisible = true
@@ -384,7 +390,22 @@
         this.dialogHeadVisible = true
         this.searchFlag = true
         this.dialogTitle = '入库单查询'
+      },
+      resetAll() {
+        if (!this.searchFlag) {
+          this.$refs.inboundOrderAdd.$refs.inboundOrderForm.resetFields()
+        }
+        this.form = {}
+        this.orderLineList = []
+      },
+      notifyLineData() {
+        this.$emit('notify', true)
       }
+    },
+    computed: {
+      ...mapGetters([
+        'headIdFlag'
+      ])
     }
   }
 </script>
@@ -398,9 +419,8 @@
         width: 143px;
     }
 
-
-    .dialog-head {
-        height: 20px;
-        line-height: 20px;
+    .head-wrapper > .el-button {
+        float: right;
+        margin-right: 3px;
     }
 </style>

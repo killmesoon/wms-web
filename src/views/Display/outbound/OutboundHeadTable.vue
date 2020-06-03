@@ -1,20 +1,20 @@
 <template>
     <div style="position: relative;">
-        <div>
-            <DatePeriodSelect :default-period-date="selectedDate" :clearable="false" class="filter-item"
-                              @getSelectedDate="getSelectedDate"/>
-            <el-select v-model="listQuery.selectApplication" placeholder="请选择工厂">
-                <el-option
-                        v-for="item in plantList"
-                        :key="item.plantId"
-                        :label="item.plantName"
-                        :value="item.plantId"
-                />
-            </el-select>
+        <div class="button-wrapper">
+<!--            <DatePeriodSelect :default-period-date="selectedDate" :clearable="false" class="filter-item"-->
+<!--                              @getSelectedDate="getSelectedDate"/>-->
+<!--            <el-select v-model="listQuery.selectApplication" placeholder="请选择工厂">-->
+<!--                <el-option-->
+<!--                        v-for="item in plantList"-->
+<!--                        :key="item.plantId"-->
+<!--                        :label="item.plantName"-->
+<!--                        :value="item.plantId"-->
+<!--                />-->
+<!--            </el-select>-->
             <!--      <KeyWordSearch input-width="360px" place-holder="支持账户名、显示名称、手机号、邮箱快速搜索" @search="getSearchData" />-->
-            <el-button type="primary" icon="el-icon-plus" @click="outboundOrderAdd"> 录入</el-button>
-            <el-button type="danger" icon="el-icon-delete"> 批量删除</el-button>
-            <el-button type="primary" icon="el-icon-search" @click="searchOutbound">查询</el-button>
+            <el-button type="danger" size="mini" icon="el-icon-delete"> 批量删除</el-button>
+            <el-button type="primary" size="mini" icon="el-icon-plus" @click="outboundOrderAdd"> 录入</el-button>
+            <el-button type="primary" size="mini" icon="el-icon-search" @click="searchOutbound">查询</el-button>
         </div>
         <div>
             <el-table
@@ -59,6 +59,7 @@
                 <el-table-column prop="note" label="备注">
                 </el-table-column>
                 <el-table-column
+                        align="center"
                         width="180"
                         label="操作">
                     <template slot-scope="scope">
@@ -77,12 +78,9 @@
                     @pagination="initData"
             />
         </div>
-        <el-dialog :visible.sync="dialogHeadVisible" width="50%" :close-on-click-modal="closeFlag">
-            <div slot="title" class="dialog-head">
-                <span>{{dialogTitle}}</span>
-            </div>
+        <el-dialog :visible.sync="dialogHeadVisible" width="50%" :title="dialogTitle" :close-on-click-modal="closeFlag" @close="resetAll">
             <outbound-order-add :form="form" :flag="searchFlag" ref="outboundOrderAdd"></outbound-order-add>
-            <outbound-line-add @event1="getFromSon" v-if="!searchFlag"></outbound-line-add>
+            <outbound-line-add @event1="getFromSon" v-if="!searchFlag" :data="orderLineList"></outbound-line-add>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="cancelAdd">取 消</el-button>
                 <el-button type="primary" @click="confirmSubmit">确 定</el-button>
@@ -97,7 +95,7 @@
   import Pagination from '@/components/Pagination'
   import OutboundOrderAdd from './OutboundOrderAdd'
   import OutboundLineAdd from './OutboundLineAdd'
-  import {getOutBoundOrderList , saveOrUpdateOutboundHead ,deleteOutboundOrderLinesByHeadId ,saveOrUpdateOutboundOrderLineList , deleteOutboundHeadByHeadId} from '../../../api/outbound/outbound'
+  import {getOutBoundOrderList , saveOrUpdateOutboundHead ,deleteOutboundOrderLinesByHeadId ,saveOrUpdateOutboundOrderLineList , deleteOutboundHeadByHeadId ,findOutboundOrderLineListByHeadId} from '../../../api/outbound/outbound'
   import { Message } from 'element-ui'
 
   export default {
@@ -127,25 +125,12 @@
           startTime: '',
           endTime: ''
         },
-        plantList: [
-          {
-            id: 1,
-            plantId: 1,
-            plantName: '上海外高桥一场',
-            plantCode: 'WGQ1'
-          },
-          {
-            id: 2,
-            plantId: 2,
-            plantName: '上海外高桥二场',
-            plantCode: 'WGQ2'
-          }
-        ],
         total: 4,
         form: {},
         dialogTitle: '出库单录入',
         formLine: {},
-        addOrderLineData: []
+        addOrderLineData: [],
+        orderLineList: []
       }
     },
     created() {
@@ -228,7 +213,6 @@
        */
       cancelAdd() {
         this.dialogHeadVisible = false
-        this.form = {}
         this.dialogTitle = '出库单录入'
       },
       confirmSubmit() {
@@ -269,7 +253,8 @@
                     if (res.code == 200) {
                       Message.success(res.msg)
                       this.dialogHeadVisible = false
-                      this.initData()
+                      // this.initData()
+                      this.notifyLineData()
                       this.form = {}
                       this.addOrderLineData = []
                     } else {
@@ -323,6 +308,34 @@
         this.dialogHeadVisible = true
         this.searchFlag = true
         this.dialogTitle = '出库单查询'
+      },
+      resetAll() {
+        if (!this.searchFlag) {
+          this.$refs.outboundOrderAdd.$refs.outboundOrderForm.resetFields()
+        }
+        this.form = {}
+        this.orderLineList = []
+      },
+      editHeadOrder(data) {
+        findOutboundOrderLineListByHeadId({current:1, size:-1},data.headId).then(res =>{
+          if (res.code == 200) {
+            let t = res.data.records
+            this.dialogTitle = '出库单编辑'
+            this.form = JSON.parse(JSON.stringify(data))
+            this.orderLineList = JSON.parse(JSON.stringify(t))
+            this.form.docType = parseInt(data.docType)
+            this.form.docStatus = parseInt(data.docStatus)
+            this.form.sourceDocType = parseInt(data.sourceDocType)
+            this.dialogHeadVisible = true
+          } else {
+            Message.error(res.msg)
+          }
+        }).catch(e => {
+          Message.error(e)
+        })
+      },
+      notifyLineData() {
+        this.$emit('notify', true)
       }
     }
   }
@@ -336,15 +349,8 @@
     .el-date-range-picker__editor {
         width: 143px;
     }
-
-    .el-dialog__header {
-        /*background-color: #027AFF;*/
-        background-color: #011C1D;
-        color: #fff;
-    }
-
-    .dialog-head {
-        height: 20px;
-        line-height: 20px;
+    .button-wrapper > .el-button {
+        float: right;
+        margin-right: 3px;
     }
 </style>
