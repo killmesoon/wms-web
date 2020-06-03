@@ -52,3 +52,17 @@ export function deleteUomByIdList(data) {
     data
   })
 }
+
+/**
+ * 根据uomType返回是否可以选择主单位标识
+ * @param uomType
+ */
+export function queryPrimaryUomTypeList(uomType) {
+  return request({
+    url: '/uom/wms-uom/queryPrimaryUomTypeList',
+    method: 'get',
+    params: {
+      uomType: uomType
+    }
+  })
+}
