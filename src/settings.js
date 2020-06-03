@@ -1,5 +1,5 @@
 module.exports = {
-  title: 'EEPM-DEMO',
+  title: '仓储管理',
   /**
    * @type {boolean} true | false
    * @description Whether need tagsView

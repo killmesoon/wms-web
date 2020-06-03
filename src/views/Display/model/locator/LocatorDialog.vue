@@ -68,7 +68,7 @@
             <el-form-item v-if="flag" label="货位编码" :label-width="formLabelWidth" prop="locatorCode" >
                 <el-input v-model="form.locatorCode"  placeholder="请定义货位编码" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item v-else label="货位编码" :label-width="formLabelWidth" prop="locatorCode" :rules="[{ required: true, message: '请输入货位编码', trigger: 'blur' }]">
+            <el-form-item v-else label="货位编码" :label-width="formLabelWidth" prop="locatorCode" :rules="[{ required: true, message: '请定义货位编码', trigger: 'blur' }]">
                 <el-input v-model="form.locatorCode" placeholder="请定义货位编码" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item v-if="flag" label="货位名称" :label-width="formLabelWidth" prop="locatorName">
