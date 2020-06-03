@@ -1,8 +1,20 @@
 <template>
     <div>
-        <el-form :model="form" size="small" label-position="left" :inline="isFormInline">
-            <el-form-item label="工厂编码" :label-width="formLabelWidth">
-                <el-select v-model="form.plantCode" @change="plantChange" value-key="plantId">
+        <el-form :model="form" size="small" label-position="right" ref="barcodeForm" :inline="isFormInline">
+            <el-form-item v-if="flag" label="工厂编码" :label-width="formLabelWidth" prop="plantCode"
+            >
+                <el-select v-model="form.plantCode" @change="plantChange" placeholder="请选择工厂编码" value-key="plantId">
+                    <el-option
+                            v-for="item in plantList"
+                            :key="item.plantId"
+                            :label="item.plantCode"
+                            :value="item"
+                    />
+                </el-select>
+            </el-form-item>
+            <el-form-item v-else label="工厂编码" :label-width="formLabelWidth" prop="plantCode"
+                          :rules="[{ required: true, message: '请选择工厂编码', trigger: 'change' }]">
+                <el-select v-model="form.plantCode" @change="plantChange" placeholder="请选择工厂编码" value-key="plantId">
                     <el-option
                             v-for="item in plantList"
                             :key="item.plantId"
@@ -12,35 +24,50 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="工厂名称" :label-width="formLabelWidth">
-                <el-input v-model="form.plantName" autocomplete="off"></el-input>
+                <el-input v-model="form.plantName" :disabled="disable"  autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="条码号" :label-width="formLabelWidth">
-                <el-input v-model="form.barcode" autocomplete="off"></el-input>
+            <el-form-item v-if="flag" label="条码号" :label-width="formLabelWidth">
+                <el-input v-model="form.barcode" placeholder="请输入条码号" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item v-else label="条码号" :label-width="formLabelWidth" prop="barcode" :rules="[{ required: true, message: '请输入条码号', trigger: 'blur' }]" >
+                <el-input v-model="form.barcode" placeholder="请输入条码号" autocomplete="off"></el-input>
             </el-form-item>
 
-            <el-form-item label="条码类型" :label-width="formLabelWidth">
-                <el-select v-model="form.barcodeType" placeholder="请选择">
+            <el-form-item v-if="flag" label="条码类型" :label-width="formLabelWidth">
+                <el-select v-model="form.barcodeType" placeholder="请选择条码类型">
                     <el-option v-for="item in dicBarcodeTypeList" :value="item.dicId" :key="item.dicId"
                                :label="item.dicName"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="条码状态" :label-width="formLabelWidth">
-                <el-select v-model="form.barcodeStatus" placeholder="请选择">
+            <el-form-item v-else label="条码类型" :label-width="formLabelWidth" prop="barcodeType" :rules="[{ required: true, message: '请选择条码类型', trigger: 'change' }]" >
+                <el-select v-model="form.barcodeType" placeholder="请选择条码类型">
+                    <el-option v-for="item in dicBarcodeTypeList" :value="item.dicId" :key="item.dicId"
+                               :label="item.dicName"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-if="flag" label="条码状态" :label-width="formLabelWidth">
+                <el-select v-model="form.barcodeStatus" placeholder="请选择条码状态">
+                    <el-option v-for="item in dicBarcodeStatusList" :value="item.dicId" :key="item.dicId"
+                               :label="item.dicName"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-else label="条码状态" :label-width="formLabelWidth" prop="barcodeStatus" :rules="[{ required: true, message: '请选择条码状态', trigger: 'change' }]">
+                <el-select v-model="form.barcodeStatus" placeholder="请选择条码状态">
                     <el-option v-for="item in dicBarcodeStatusList" :value="item.dicId" :key="item.dicId"
                                :label="item.dicName"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="条码描述" :label-width="formLabelWidth">
-                <el-input v-model="form.description" autocomplete="off"></el-input>
+                <el-input v-model="form.description" placeholder="请输入条码描述" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item label="供应商编码" :label-width="formLabelWidth">
-                <el-select v-model="form.supplierCode"  @change="warehouseChange" value-key="supplierId">
+                <el-select v-model="form.supplierCode"  @change="warehouseChange" placeholder="请选择供应商编码" value-key="supplierId">
                     <el-option v-for="item in supplierList"
                                :label="item.supplierCode" :key="item.supplierId" :value="item"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="供应商名称" :label-width="formLabelWidth">
-                <el-input v-model="form.supplierName" autocomplete="off"></el-input>
+                <el-input v-model="form.supplierName" :disabled="disable" autocomplete="off"></el-input>
             </el-form-item>
         </el-form>
     </div>
@@ -80,36 +107,11 @@
           {
             id: 1,
             plantId: 1,
-            plantName: '上海外高桥一场',
+            plantName: '上海外高桥一厂',
             plantCode: 'WGQ1'
-          },
-          {
-            id: 2,
-            plantId: 2,
-            plantName: '上海外高桥二场',
-            plantCode: 'WGQ2'
           }
         ],
-        areaList: [
-          {
-            areaId: 1,
-            areaCode: 'A',
-            areaName: '区域A',
-            areaType: '类型A'
-          },
-          {
-            areaId: 2,
-            areaCode: 'B',
-            areaName: '区域B',
-            areaType: '类型B'
-          },
-          {
-            areaId: 3,
-            areaCode: 'C',
-            areaName: '区域C',
-            areaType: '类型C'
-          }
-        ]
+        disable: true
       }
     },
     methods: {
@@ -136,6 +138,9 @@
     watch: {
       data(current, old) {
         this.form = JSON.parse(JSON.stringify(current))
+      },
+      flag(current, old) {
+        this.flag = current
       }
     }
   }

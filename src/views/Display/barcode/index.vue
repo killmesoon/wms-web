@@ -1,19 +1,19 @@
 <template>
-    <div style="position: relative;">
-        <DatePeriodSelect :default-period-date="selectedDate" :clearable="false" class="filter-item"
-                          @getSelectedDate="getSelectedDate"/>
-        <el-select v-model="listQuery.selectApplication" placeholder="请选择工厂">
-            <el-option
-                    v-for="item in plantList"
-                    :key="item.plantId"
-                    :label="item.plantName"
-                    :value="item.plantId"
-            />
-        </el-select>
+    <div ref="mainContent" class="main-content">
+        <!--        <DatePeriodSelect :default-period-date="selectedDate" :clearable="false" class="filter-item"-->
+        <!--                          @getSelectedDate="getSelectedDate"/>-->
+        <!--        <el-select v-model="listQuery.selectApplication" placeholder="请选择工厂">-->
+        <!--            <el-option-->
+        <!--                    v-for="item in plantList"-->
+        <!--                    :key="item.plantId"-->
+        <!--                    :label="item.plantName"-->
+        <!--                    :value="item.plantId"-->
+        <!--            />-->
+        <!--        </el-select>-->
         <!--      <KeyWordSearch input-width="360px" place-holder="支持账户名、显示名称、手机号、邮箱快速搜索" @search="getSearchData" />-->
-        <el-button type="primary" icon="el-icon-plus" @click="supplierAdd"> 录入</el-button>
-        <el-button type="danger" icon="el-icon-delete" @click="deleteOrderList"> 批量删除</el-button>
-        <el-button type="primary" icon="el-icon-search" @click="searchData"> 查询</el-button>
+        <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteOrderList"> 批量删除</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-plus" @click="supplierAdd"> 录入</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-search" @click="searchData"> 查询</el-button>
         <div>
             <el-table
                     ref="table"
@@ -66,8 +66,7 @@
                     @pagination="initData"
             />
         </div>
-        <el-dialog :visible.sync="dialogVisible" width="50%" :close-on-click-modal="closeFlag">
-            <div slot="title" class="dialog-head">{{dialogTitle}}</div>
+        <el-dialog :visible.sync="dialogVisible" :title="dialogTitle" width="50%" :close-on-click-modal="closeFlag" @close="resetAll">
             <barcode-dialog :data="form" :flag="searchFlag" ref="dialogBarcode"></barcode-dialog>
             <div slot="footer">
                 <el-button @click="cancelAdd">取 消</el-button>
@@ -102,20 +101,6 @@
       return {
         closeFlag: false,
         tableData: [],
-        plantList: [
-          {
-            id: 1,
-            plantId: 1,
-            plantName: '上海外高桥一场',
-            plantCode: 'WGQ1'
-          },
-          {
-            id: 2,
-            plantId: 2,
-            plantName: '上海外高桥二场',
-            plantCode: 'WGQ2'
-          }
-        ],
         listQuery: {
           page: 1,
           limit: 20,
@@ -177,9 +162,6 @@
         // console.log(this.$refs.dialogData.form)
         let form = JSON.parse(JSON.stringify(this.$refs.dialogBarcode.form))
         this.form = form
-        // if (this.form.enableFlag != null) {
-        //   this.form.enableFlag = parseInt(this.form.enableFlag)
-        // }
         if (this.searchFlag) {
           queryBarcodeList({
             current: this.listQuery.page,
@@ -196,17 +178,21 @@
             Message.error(e)
           })
         } else {
-          saveOrUpdateBarcode(this.form).then(res => {
-            if (res.code == 200) {
-              Message.success(res.msg)
-              this.form = {}
-              this.dialogVisible = false
-              this.initData()
-            } else {
-              Message.error(res.msg)
+          this.$refs.dialogBarcode.$refs.barcodeForm.validate((valid) => {
+            if (valid) {
+              saveOrUpdateBarcode(this.form).then(res => {
+                if (res.code == 200) {
+                  Message.success(res.msg)
+                  this.form = {}
+                  this.dialogVisible = false
+                  this.initData()
+                } else {
+                  Message.error(res.msg)
+                }
+              }).catch(e => {
+                Message.error(e)
+              })
             }
-          }).catch(e => {
-            Message.error(e)
           })
         }
       },
@@ -283,11 +269,25 @@
         this.form.barcodeType = parseInt(this.form.barcodeType)
         this.form.barcodeStatus = parseInt(this.form.barcodeStatus)
         this.dialogTitle = '编辑区域'
+      },
+      resetAll() {
+        if (!this.searchFlag) {
+          this.$refs.dialogBarcode.$refs.barcodeForm.resetFields()
+        }
+        this.form = {}
       }
     }
   }
 </script>
 
 <style scoped>
-
+    .main-content {
+        background: white;
+        height: calc(100vh - 84px);
+        padding: 10px;
+    }
+    .main-content > .el-button {
+        float: right;
+        margin-right: 3px;
+    }
 </style>
