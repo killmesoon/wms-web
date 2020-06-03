@@ -9,3 +9,14 @@ export function initDicList() {
     method: 'get'
   })
 }
+
+/**
+ * 查询所有字典类型
+ * @param params
+ */
+export function queryWmsDicListExtList() {
+  return request({
+    url: '/dic/wms-dic-list/queryWmsDicListExtList',
+    method: 'get'
+  })
+}

@@ -19,7 +19,7 @@ body {
 }
 .white-body-view {
   margin: 0px;
-  padding: 10px 10px;
+  padding: 20px 20px;
   height: calc(100vh - 84px);
   background-color: #fff;
   overflow: auto;
@@ -165,23 +165,23 @@ div:focus {
   width: 18px;
   height: 14px;
 }
- 
+
 ::-webkit-scrollbar-track,
 ::-webkit-scrollbar-thumb {
   border-radius: 999px;
   border: 5px solid transparent;
 }
- 
+
 ::-webkit-scrollbar-track {
   box-shadow: 1px 1px 5px rgba(0,0,0,.2) inset;
 }
- 
+
 ::-webkit-scrollbar-thumb {
   min-height: 20px;
   background-clip: content-box;
   box-shadow: 0 0 0 5px rgba(0,0,0,.2) inset;
 }
- 
+
 ::-webkit-scrollbar-corner {
   background: transparent;
 }
