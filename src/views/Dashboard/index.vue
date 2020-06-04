@@ -1,62 +1,186 @@
 <template>
-  <div class="app-container">
-    <Authorized :authority="['ROLE_ADMIN']">
-      <div class="box">
-        <div class="system-logo">
-          <img :src="logo" class="dashboard-logo">
+    <div class="white-body-view dashboard-style">
+        <div class="top-view">
+            <div class="view-item">
+                <div class="job-item-view">
+                    <div class="view-item">
+                        <div class="item-circle">
+                        </div>
+                      <div class="item-text">
+                        <h1 style="color: #026ee6;">15</h1>
+                        <div><span>今日任务数</span></div>
+                      </div>
+                    </div>
+                    <div class="view-item">
+                      <div class="item-circle"></div>
+                      <div class="item-text">
+                        <h1 style="color: coral;">10</h1>
+                        <div><span>待处理任务数</span></div>
+                      </div>
+                    </div>
+                    <div class="view-item">
+                      <div class="item-circle"></div>
+                      <div class="item-text">
+                        <h1 style="color: #5daf34">5</h1>
+                        <div><span>已完成任务数</span></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="view-item">
+              <div class="job-item-view">
+                <div class="view-item">
+                  <div class="item-menu" @click="changeRoute('inbound')">
+                    <div class="menu-route inbound"></div>
+                      <div class="menu-text">入库单管理</div>
+                  </div>
+                </div>
+                <div class="view-item">
+                  <div class="item-menu" @click="changeRoute('outbound')">
+                    <div class="menu-route outbound"></div>
+                      <div class="menu-text">出库单管理</div>
+                  </div>
+                </div>
+                <div class="view-item">
+                  <div class="item-menu">
+                    <div class="menu-route search" @click="warning"></div>
+                      <div class="menu-text">现有量查询</div>
+                  </div>
+                </div>
+              </div>
+            </div>
         </div>
-        <div class="system-title">
-          欢迎使用EEPM-DEMO前端演示系统
+        <div class="bottom-view">
+            <div class="view-item">
+                <div class="job-item-view">
+
+                </div>
+            </div>
+            <div class="view-item">
+                <div class="job-item-view">
+                </div>
+            </div>
+            <div class="view-item">
+                <div class="job-item-view">
+                </div>
+            </div>
         </div>
-      </div>
-    </Authorized>
-  </div>
+    </div>
 </template>
 
 <script>
-
-export default {
-  name: 'Dashboard',
-  data() {
-    return {
-      logo: require('@/assets/images/brand/business-brand-single.png')
-    }
-  },
-  methods: {
-    resize() {
-      console.log('resize')
+    import {Message} from 'element-ui'
+  export default {
+    name: 'Dashboard',
+    data() {
+      return {}
+    },
+    methods: {
+      resize() {
+        console.log('resize')
+      },
+      changeRoute(url) {
+        console.log(this.$route)
+        this.$router.push({path: '/' + url})
+      },
+      warning() {
+        Message.warning("功能暂未开放")
+      }
     }
   }
-}
 </script>
 
-<style  scoped>
- .app-container{
-   height: calc(100vh - 84px);
-   background: #98D7E9;
- }
- .box{
-   height:300px;
-   margin: 0 auto;
-   margin-top:10%;
-   text-align: center;
- }
- .system-logo{
-   width: 120px;
-   height: 120px;
-   border: 5px solid #E7FFFF;
-   border-radius: 50%;
-   margin: 0 auto;
-   margin-bottom: 30px;
- }
- .dashboard-logo{
-   width: 80px;
-   margin-top: 25px;
- }
- .system-title{
-   color: #E7FFFF;
-   font-size: 42px;
-   font-weight: 600;
-   letter-spacing: 8px;
- }
+<style scoped>
+    .dashboard-style {
+        background-color: #faf9f9;
+    }
+
+    .top-view {
+        height: 40%;
+        padding: 10px;
+        display: flex;
+    }
+
+    .bottom-view {
+        height: 60%;
+        padding: 10px;
+        display: flex;
+    }
+
+    .view-item {
+        flex: 1;
+        position: relative;
+    }
+
+    .job-item-view {
+        width: 98%;
+        height: 100%;
+        padding: 20px 20px;
+        background-color: #fff;
+        display: flex;
+    }
+
+    .item-circle {
+        width: 200px;
+        height: 200px;
+        background-color: #eeeeee;
+        border-radius: 50%;
+        -moz-border-radius: 50%;
+        -webkit-border-radius: 50%;
+        position: absolute;
+        left: calc(50% - 100px);
+        top: calc(50% - 100px);
+    }
+  .item-text {
+    width: 150px;
+    height: 150px;
+    position: absolute;
+    left: calc(50% - 75px);
+    top: calc(50% - 75px);
+    text-align: center;
+  }
+  .item-text h1 {
+    font-size: 2.5em;
+  }
+  .item-text > div {
+    height: 30px;
+    line-height: 30px;
+    font-size: 1em;
+    font-weight: 700;
+  }
+
+  .item-menu {
+      width: 150px;
+      height: 150px;
+      position: absolute;
+      left: calc(50% - 75px);
+      top: calc(50% - 75px);
+      text-align: center;
+      cursor: pointer;
+  }
+
+  .menu-route {
+      position: absolute;
+      height: 40px;
+      width: 40px;
+      left: calc(50% - 20px);
+      top: calc(50% - 40px);
+  }
+    .menu-text {
+        position: absolute;
+        width: 100px;
+        height: 30px;
+        line-height: 30px;
+        left: calc(50% - 50px);
+        top: 55%;
+    }
+    .inbound {
+        background: url("../../assets/images/dashboard/inbound.png") no-repeat;
+    }
+    .outbound {
+        background: url("../../assets/images/dashboard/outbound.png") no-repeat;
+    }
+    .search {
+        background: url("../../assets/images/dashboard/search.png") no-repeat;
+    }
 </style>
