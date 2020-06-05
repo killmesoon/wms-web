@@ -283,6 +283,8 @@
               }).catch(e => {
                 Message.error(e)
               })
+            } else {
+              Message.error("仓库已关联，无法删除")
             }
           })
         }).catch(() => {

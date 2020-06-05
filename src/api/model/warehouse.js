@@ -51,7 +51,7 @@ export function deleteWarehouseById(id) {
  */
 export function deleteFlag(id) {
   return request({
-    url: '/warehouse/wms-warehouse/warehouseDeleteFlag/'+ id,
+    url: '/warehouse/wms-warehouse/isDeleteFlag/'+ id,
     method: 'get'
   })
 }

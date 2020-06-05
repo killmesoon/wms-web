@@ -43,7 +43,7 @@
                 </div>
                 <div class="view-item">
                   <div class="item-menu">
-                    <div class="menu-route search" @click="warning"></div>
+                    <div class="menu-route search" @click="changeRoute('report')"></div>
                       <div class="menu-text">现有量查询</div>
                   </div>
                 </div>
@@ -82,9 +82,6 @@
       changeRoute(url) {
         console.log(this.$route)
         this.$router.push({path: '/' + url})
-      },
-      warning() {
-        Message.warning("功能暂未开放")
       }
     }
   }
