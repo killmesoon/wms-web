@@ -55,3 +55,15 @@ export function deleteFlag(id) {
     method: 'get'
   })
 }
+
+/**
+ * 批量删除校验
+ * @param data
+ */
+export function ifWarehouseListDelete(data) {
+  return request({
+    url: '/warehouse/wms-warehouse/ifWarehouseListDelete',
+    method: 'post',
+    data
+  })
+}

@@ -95,7 +95,9 @@
     saveOrUpdateWarehouseAreaList,
     queryWarehouseAreaList,
     deleteWarehouseAreaList,
-    deleteWarehouseAreaById
+    deleteWarehouseAreaById,
+    isWarehouseAreaDelete,
+    isWarehouseAreaListDelete
   } from '../../../../api/data/area'
 
   export default {
@@ -110,20 +112,6 @@
       return {
         closeFlag: false,
         tableData: [],
-        plantList: [
-          {
-            id: 1,
-            plantId: 1,
-            plantName: '上海外高桥一场',
-            plantCode: 'WGQ1'
-          },
-          {
-            id: 2,
-            plantId: 2,
-            plantName: '上海外高桥二场',
-            plantCode: 'WGQ2'
-          }
-        ],
         listQuery: {
           page: 1,
           limit: 20,
@@ -245,15 +233,21 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          deleteWarehouseAreaList(headIdList).then(res => {
-            if (res.code == 200) {
-              Message.success('删除成功')
-              this.initData()
+          isWarehouseAreaListDelete(headIdList).then(res => {
+            if (res.data) {
+              deleteWarehouseAreaList(headIdList).then(res => {
+                if (res.code == 200) {
+                  Message.success('删除成功')
+                  this.initData()
+                } else {
+                  Message.error(res.msg)
+                }
+              }).catch(e => {
+                Message.error(e)
+              })
             } else {
-              Message.error(res.msg)
+              Message.error("选中的区域存在关联关系，无法删除")
             }
-          }).catch(e => {
-            Message.error(e)
           })
         }).catch(() => {
           this.$message({
@@ -268,12 +262,18 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          deleteWarehouseAreaById(data.areaId).then(res => {
-            if (res.code == 200) {
-              Message.success(res.msg)
-              this.initData()
+          isWarehouseAreaDelete(data.areaId).then(res => {
+            if (res.data) {
+              deleteWarehouseAreaById(data.areaId).then(res => {
+                if (res.code == 200) {
+                  Message.success(res.msg)
+                  this.initData()
+                } else {
+                  Message.error(res.msg)
+                }
+              })
             } else {
-              Message.error(res.msg)
+              Message.error("区域已关联，无法删除")
             }
           })
         }).catch(() => {

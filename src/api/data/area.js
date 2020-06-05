@@ -49,3 +49,26 @@ export function deleteWarehouseAreaById(id) {
   })
 }
 
+/**
+ * 验证是否可以删除
+ * @param id
+ */
+export function isWarehouseAreaDelete(id) {
+  return request({
+    url: '/area/wms-warehouse-area/isWarehouseAreaDelete/' + id,
+    method: 'get'
+  })
+}
+
+/**
+ * 批量删除时的标识
+ * @param data
+ */
+export function isWarehouseAreaListDelete(data) {
+  return request({
+    url: '/area/wms-warehouse-area/isWarehouseAreaListDelete',
+    method: 'post',
+    data
+  })
+}
+

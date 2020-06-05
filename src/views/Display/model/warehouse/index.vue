@@ -98,7 +98,8 @@
     getWareHouseList,
     saveOrUpdateWarehouse,
     deleteWarehouseList, deleteWarehouseById,
-    deleteFlag
+    deleteFlag,
+    ifWarehouseListDelete
   } from '../../../../api/model/warehouse'
   import WarehouseDialog from '../area/WarehouseDialog'
 
@@ -248,15 +249,21 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          deleteWarehouseList(headIdList).then(res => {
-            if (res.code == 200) {
-              Message.success('删除成功')
-              this.initData()
+          ifWarehouseListDelete(headIdList).then(res => {
+            if (res.data) {
+              deleteWarehouseList(headIdList).then(res => {
+                if (res.code == 200) {
+                  Message.success('删除成功')
+                  this.initData()
+                } else {
+                  Message.error(res.msg)
+                }
+              }).catch(e => {
+                Message.error(e)
+              })
             } else {
-              Message.error(res.msg)
+              Message.error("选中仓库已关联，无法删除")
             }
-          }).catch(e => {
-            Message.error(e)
           })
         }).catch(() => {
           this.$message({
