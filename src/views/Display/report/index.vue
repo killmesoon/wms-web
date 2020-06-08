@@ -57,7 +57,7 @@
 <script>
   import KeyWordSearch from '@/components/Search/KeyWordSearch'
   import Pagination from '@/components/Pagination'
-  import {queryQuantityList} from '../../../api/asn'
+  import {queryQuantityList} from '../../../api/report'
 
   export default {
     name: 'index',
