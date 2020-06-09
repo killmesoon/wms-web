@@ -229,7 +229,7 @@
 
       },
       resetAll() {
-        if (this.searchFlag) {
+        if (!this.searchFlag) {
           this.$refs.itemDialog.$refs.itemForm.resetFields()
         }
         this.form = {}

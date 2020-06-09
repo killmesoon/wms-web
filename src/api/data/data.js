@@ -8,7 +8,7 @@ import request from "@/utils/request"
  */
 export function getItemList(params, data) {
   return request({
-    url: '/item/wms-item/findItemList',
+    url: '/item/wms-item/queryItemList',
     method: 'post',
     params,
     data
