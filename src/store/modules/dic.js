@@ -13,7 +13,8 @@ const state = {
   dicLocatorTypeList: [],
   dicUomTypeList: [],
   dicBarcodeTypeList: [],
-  dicBarcodeStatusList: []
+  dicBarcodeStatusList: [],
+  dicItemTypeList: []
 }
 
 const mutations = {
@@ -52,6 +53,9 @@ const mutations = {
   },
   SET_BARCODE_STATUS_LIST: (state, list) => {
     state.dicBarcodeStatusList = list
+  },
+  SET_ITEM_TYPE_LIST: (state, list) => {
+    state.dicItemTypeList = list
   }
 
 }
@@ -73,6 +77,7 @@ const actions = {
         let dicUomTypeList = [] //单位类型
         let dicBarcodeTypeList = [] //条码类型
         let dicBarcodeStatusList = [] //条码状态
+        let dicItemTypeList = [] //物料类型
         for (let dic of data) {
           switch (dic.dicTypeId) {
             case 1:
@@ -102,6 +107,9 @@ const actions = {
             case 10:
               dicBarcodeStatusList.push(dic)
               break
+            case 11:
+              dicItemTypeList.push(dic)
+              break
             case 16:
               dicDocStatusList.push(dic)
               break
@@ -122,9 +130,10 @@ const actions = {
         commit('SET_WAREHOUSE_TYPE_LIST', dicWarehouseTypeList)
         commit('SET_AREA_TYPE_LIST', dicAreaTypeList)
         commit('SET_LOCATOR_TYPE_LIST', dicLocatorTypeList),
-          commit('SET_UOM_TYPE_LIST', dicUomTypeList),
-          commit('SET_BARCODE_TYPE_LIST', dicBarcodeTypeList),
-          commit('SET_BARCODE_STATUS_LIST', dicBarcodeStatusList)
+        commit('SET_UOM_TYPE_LIST', dicUomTypeList),
+        commit('SET_BARCODE_TYPE_LIST', dicBarcodeTypeList),
+        commit('SET_BARCODE_STATUS_LIST', dicBarcodeStatusList)
+        commit('SET_ITEM_TYPE_LIST', dicItemTypeList)
         resolve()
       }).catch(error => {
         reject(error)
