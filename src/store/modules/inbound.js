@@ -1,7 +1,8 @@
 
 const state = {
   headIdFlag: 0,
-  outboundHeadIdFlag: 0
+  outboundHeadIdFlag: 0,
+  asnHeadFlag: 0
 }
 
 const mutations = {
@@ -10,6 +11,9 @@ const mutations = {
   },
   SET_OUTBOUND_HEAD_ID: (state , outboundHeadIdFlag) => {
     state.outboundHeadIdFlag = outboundHeadIdFlag
+  },
+  SET_ASN_HEAD_ID: (state , asnHeadFlag) => {
+    state.asnHeadFlag = asnHeadFlag
   }
 }
 
@@ -19,6 +23,9 @@ const actions = {
   },
   setOutboundHeadId({commit}, headId) {
     commit('SET_OUTBOUND_HEAD_ID', headId)
+  },
+  setAsnHeadId({commit}, headId) {
+    commit('SET_ASN_HEAD_ID', headId)
   }
 }
 
