@@ -2,17 +2,6 @@
     <div>
         <div style="position: relative;">
             <div class="head-wrapper">
-                <!--            <DatePeriodSelect :default-period-date="selectedDate" :clearable="false" class="filter-item"-->
-                <!--                              @getSelectedDate="getSelectedDate"/>-->
-                <!--            <el-select v-model="listQuery.selectApplication" placeholder="请选择工厂">-->
-                <!--                <el-option-->
-                <!--                        v-for="item in plantList"-->
-                <!--                        :key="item.plantId"-->
-                <!--                        :label="item.plantName"-->
-                <!--                        :value="item.plantId"-->
-                <!--                />-->
-                <!--            </el-select>-->
-                <!--      <KeyWordSearch input-width="360px" place-holder="支持账户名、显示名称、手机号、邮箱快速搜索" @search="getSearchData" />-->
                 <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteOrderList"> 批量删除</el-button>
                 <el-button type="primary" size="mini" icon="el-icon-plus" @click="inboundAdd"> 录入</el-button>
                 <el-button type="primary" size="mini" icon="el-icon-search" @click="searchInbound"> 查询</el-button>
@@ -82,13 +71,22 @@
                 />
             </div>
         </div>
+        <el-dialog :visible.sync="dialogHeadVisible" :title="dialogTitle" width="50%" :close-on-click-modal="closeFlag" @close="resetAll">
+            <asn-head-add :data="form" :flag="searchFlag" ref="asnDialog"></asn-head-add>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogHeadVisible = false">取 消</el-button>
+                <el-button type="primary" @click="confirmSubmit">确 定</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
 <script>
   import Pagination from '@/components/Pagination'
-  import { queryWmsErpAsnHeadList } from '../../../api/asn'
+  import { queryWmsErpAsnHeadList , saveOrUpdateWmsErpAsnHead } from '../../../api/asn'
   import {mapGetters} from 'vuex'
+  import AsnHeadAdd from './AsnHeadAdd'
+  import {Message} from 'element-ui'
 
   export default {
     name: 'AsnHeadTable',
@@ -96,6 +94,7 @@
       this.initData()
     },
     components: {
+      AsnHeadAdd,
       Pagination
     },
     mounted() {
@@ -108,6 +107,9 @@
     data() {
       return {
         tableData: [],
+        dialogTitle: '新增送货单',
+        dialogHeadVisible: false,
+        closeFlag: false,
         loading: false,
         tableHeight: '500px',
         total: 0,
@@ -119,7 +121,12 @@
           selectApplication: '',
           startTime: '',
           endTime: ''
-        }
+        },
+        searchFlag: false,
+        form: {},
+        formLine: {},
+        addOrderLineData: [],
+        orderLineList: []
       }
     },
     methods: {
@@ -152,7 +159,89 @@
             this.tableHeight = topViewHeight - this.$refs.table.$el.offsetTop - 120
           })
         }
-      }
+      },
+      inboundAdd() {
+        this.dialogHeadVisible = true
+        this.searchFlag = false
+      },
+      searchInbound() {
+        //查询
+        this.dialogHeadVisible = true
+        this.searchFlag = true
+        this.dialogTitle = '送库单查询'
+      },
+      confirmSubmit() {
+        let t = JSON.parse(JSON.stringify(this.$refs.asnDialog.form))
+        this.form = t
+        if (this.form.isEmergency) {
+          this.form.isEmergency = parseInt(this.form.isEmergency)
+        }
+        if (this.searchFlag) {
+          this.dialogHeadVisible = false
+          const that = this
+          this.loading = true
+          if (this.form.planDeliverDateRange) {
+            this.form.planStartDate = this.form.planDeliverDateRange[0]
+            this.form.planEndDate = this.form.planDeliverDateRange[1]
+          }
+          setTimeout(() => {
+            queryWmsErpAsnHeadList({
+              current: this.listQuery.page,
+              size: this.listQuery.limit
+            }, this.form).then(res => {
+              if (res.code == 200) {
+                that.tableData = res.data.records
+                this.total = res.data.total
+                that.loading = false
+                if (this.asnHeadFlag == 0) {
+                  let first = that.tableData[0]
+                  this.$store.dispatch('inbound/setAsnHeadId', first.headId)
+                }
+
+                this.form = {}
+              }
+            })
+            that.loading = false
+          }, 500)
+        } else {
+          this.$refs.asnDialog.$refs.asnOrderForm.validate((valid) => {
+            if (valid) {
+              saveOrUpdateWmsErpAsnHead(this.form).then(res => {
+                if (res.code == 200) {
+                  Message.success(res.msg)
+                  this.dialogHeadVisible = false
+                  this.initData()
+                } else {
+                  Message.error(res.msg)
+                }
+              }).catch(e => {
+                Message.error(e)
+              })
+            } else {
+              return false
+            }
+          })
+        }
+      },
+      deleteOrderList() {
+
+      },
+      deleteHeadOrder(data) {
+
+      },
+      resetAll() {
+        if (!this.searchFlag) {
+          this.$refs.asnDialog.$refs.asnOrderForm.resetFields()
+        }
+        this.form = {}
+        this.orderLineList = []
+      },
+      handleCurrentChange(val) {
+        if (val != null) {
+          let id = parseInt(val.headId)
+          this.$store.dispatch('inbound/setAsnHeadId', id)
+        }
+      },
     },
     computed: {
       ...mapGetters([

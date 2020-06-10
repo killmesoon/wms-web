@@ -79,7 +79,7 @@
             />
         </div>
         <el-dialog :visible.sync="dialogHeadVisible" :title="dialogTitle" width="50%" :close-on-click-modal="closeFlag" @close="resetAll">
-            <inbound-order-add :form="form" :flag="searchFlag" ref="inboundOrderAdd"></inbound-order-add>
+            <inbound-order-add :data="form" :flag="searchFlag" ref="inboundOrderAdd"></inbound-order-add>
             <inbound-line-add @event1="getFromSon" v-if="!searchFlag"  :data="orderLineList"></inbound-line-add>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="cancelAdd">取 消</el-button>
@@ -293,13 +293,15 @@
        * 插入或更新
        */
       confirmSubmit() {
+        let t = JSON.parse(JSON.stringify(this.$refs.inboundOrderAdd.form))
+        this.form = t
         let headId
         if (this.searchFlag) {
-          let data = JSON.parse(JSON.stringify(this.form))
+          // let data = JSON.parse(JSON.stringify(this.form))
           findInboundList({
             current: this.listQuery.page,
             size: this.listQuery.limit
-          }, data).then(res => {
+          }, this.form).then(res => {
             if (res.code == 200) {
               this.tableData = res.data.records
               this.total = res.data.total

@@ -67,14 +67,18 @@
 
 <script>
   import {mapGetters} from 'vuex'
+  import {findSupplierList} from '../../../../api/data/supplier'
+  import {Message} from 'element-ui'
+
   export default {
     name: 'InboundOrderAdd',
-    props:[
-      'form',
-      'flag'
-    ],
+    props: {
+      data: Object,
+      flag: Boolean
+    },
     data() {
       return {
+        form: JSON.parse(JSON.stringify(this.data)),
         formLabelWidth: '100px',
         isFormInline: true,
         plantList: [
@@ -85,6 +89,7 @@
             plantCode: 'WGQ1'
           }
         ],
+        supplierList: [],
         //时间设置
         pickerOptions: {
           disabledDate(time) {
@@ -119,6 +124,14 @@
         'dicDocStatusList',
         'dicSourceOrderTypeList'
       ])
+    },
+    watch: {
+      data(current, old) {
+        this.form = JSON.parse(JSON.stringify(current))
+      },
+      flag(current, old) {
+        this.flag = current
+      }
     }
   }
 </script>
