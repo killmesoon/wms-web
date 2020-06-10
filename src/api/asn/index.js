@@ -64,3 +64,38 @@ export function queryWmsErpAsnLineListByHeadId(params,headId) {
     params
   })
 }
+
+/**
+ * 批量更新或插入
+ * @param data
+ */
+export function saveOrUpdateWmsErpAsnLine(data) {
+  return request({
+    url: '/asnLine/wms-erp-asn-line/saveOrUpdateWmsErpAsnLine',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 批量更新行信息
+ * @param data
+ */
+export function saveOrUpdateWmsErpAsnLineList(data) {
+  return request({
+    url: '/asnLine/wms-erp-asn-line/saveOrUpdateWmsErpAsnLineList',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 根据headId删除行信息
+ * @param headId
+ */
+export function deleteWmsErpAsnLineByHeadId(headId) {
+  return request({
+    url: '/asnLine/wms-erp-asn-line/deleteWmsErpAsnLineByHeadId/' + headId,
+    method: 'get'
+  })
+}

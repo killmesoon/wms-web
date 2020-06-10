@@ -41,19 +41,19 @@
                    :close-on-click-modal="isClose">
             <div slot="title" class="dialog-head"><span>行信息录入</span></div>
             <el-form :model="formLine" size="small" label-position="right" ref="inboundOrderLineForm"  :inline="isFormInline">
-<!--                <el-form-item label="行号" :label-width="formLabelWidth">-->
-<!--                    <el-input v-model="formLine.lineNum" autocomplete="off" placeholder="请输入行号">-->
-<!--                    </el-input>-->
-<!--                </el-form-item>-->
+                <!--                <el-form-item label="行号" :label-width="formLabelWidth">-->
+                <!--                    <el-input v-model="formLine.lineNum" autocomplete="off" placeholder="请输入行号">-->
+                <!--                    </el-input>-->
+                <!--                </el-form-item>-->
                 <el-form-item label="物料编码" prop="itemCode" :label-width="formLabelWidth" :rules="[{ required: true, message: '请选择物料编码', trigger: 'change' }]">
                     <el-select v-model="formLine.itemCode" placeholder="请定义物料编码" value-key="itemId" filterable
                                @change="itemCodeChange"
-                               >
+                    >
                         <el-option v-for="item in itemList" :key="item.itemId" :label="item.itemCode" :value="item">
                         </el-option>
 
                     </el-select>
-<!--                    <el-input v-model="formLine.itemCode" autocomplete="off" :disabled="disable"  v-popover:proFlag></el-input>-->
+                    <!--                    <el-input v-model="formLine.itemCode" autocomplete="off" :disabled="disable"  v-popover:proFlag></el-input>-->
                 </el-form-item>
                 <el-form-item label="物料描述" :label-width="formLabelWidth">
                     <el-input v-model="formLine.description" :disabled="disable" autocomplete="off">
@@ -108,33 +108,16 @@
 </template>
 
 <script>
-  import { getItemList } from '../../../../api/data/data'
-  import { getWareHouseList } from '../../../../api/model/warehouse'
-  import { getUomList } from '../../../../api/data/uom'
+  import { getItemList } from '../../../api/data/data'
   import { Message } from 'element-ui'
+  import { getWareHouseList } from '../../../api/model/warehouse'
+  import { getUomList } from '../../../api/data/uom'
   import { mapGetters } from 'vuex'
 
   export default {
-    name: 'InboundLineAdd',
+    name: 'AsnLineAdd',
     props: {
       data: Array
-    },
-    data() {
-      return {
-        testData: 'aaa',
-        disable: true,
-        dialogLineOrderVisible: false,
-        isFormInline: true,
-        isClose: false,
-        formLabelWidth: '100px',
-        itemList: [],
-        wareHouseList: [],
-        uomList: [],
-        applyToBody: true,
-        formLine: {},
-        addOrderLineData : this.data,
-        gridData: []
-      }
     },
     created() {
       getItemList({
@@ -174,9 +157,25 @@
       }).catch(e => {
         Message.error(e)
       })
-
     },
-    methods: {
+    data() {
+      return {
+        testData: 'aaa',
+        disable: true,
+        dialogLineOrderVisible: false,
+        isFormInline: true,
+        isClose: false,
+        formLabelWidth: '100px',
+        itemList: [],
+        wareHouseList: [],
+        uomList: [],
+        applyToBody: true,
+        formLine: {},
+        addOrderLineData : this.data,
+        gridData: []
+      }
+    },
+    methods :{
       handleCurrentChange(val) {
         this.$set(this.formLine, 'description',val.description)
         this.$set(this.formLine, 'itemCode', val.itemCode)
@@ -246,22 +245,5 @@
 </script>
 
 <style scoped>
-    .el-input {
-        width: 220px;
-    }
 
-    .el-date-range-picker__editor {
-        width: 143px;
-    }
-
-    .el-dialog__header {
-        /*background-color: #027AFF;*/
-        background-color: #011C1D;
-        color: #fff;
-    }
-
-    .dialog-head {
-        height: 20px;
-        line-height: 20px;
-    }
 </style>

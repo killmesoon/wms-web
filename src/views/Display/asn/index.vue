@@ -1,12 +1,12 @@
 <template>
     <div class="main-content">
         <div id="topView" ref="topView" class="top-view">
-            <asn-head-table></asn-head-table>
+            <asn-head-table @notify="notifyLineData"></asn-head-table>
         </div>
         <div ref="lineDiv" class="line-view" />
 
         <div id="bottomView" ref="bottomView" class="bottom-view">
-            <asn-line-table></asn-line-table>
+            <asn-line-table ref="asnLineTable"></asn-line-table>
         </div>
     </div>
 </template>
@@ -17,7 +17,12 @@
   import AsnLineTable from './AsnLineTable'
   export default {
     name: 'index',
-    components: { AsnLineTable, AsnHeadTable }
+    components: { AsnLineTable, AsnHeadTable },
+    methods: {
+      notifyLineData() {
+        this.$refs.asnLineTable.initData()
+      }
+    }
   }
 </script>
 

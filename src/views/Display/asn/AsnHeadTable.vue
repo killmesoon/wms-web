@@ -73,6 +73,7 @@
         </div>
         <el-dialog :visible.sync="dialogHeadVisible" :title="dialogTitle" width="50%" :close-on-click-modal="closeFlag" @close="resetAll">
             <asn-head-add :data="form" :flag="searchFlag" ref="asnDialog"></asn-head-add>
+            <asn-line-add :data="orderLineList" @event1="getFromSon" v-if="!searchFlag"></asn-line-add>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="dialogHeadVisible = false">取 消</el-button>
                 <el-button type="primary" @click="confirmSubmit">确 定</el-button>
@@ -83,10 +84,11 @@
 
 <script>
   import Pagination from '@/components/Pagination'
-  import { queryWmsErpAsnHeadList , saveOrUpdateWmsErpAsnHead } from '../../../api/asn'
+  import { queryWmsErpAsnHeadList , saveOrUpdateWmsErpAsnHead ,deleteWmsErpAsnLineByHeadId ,saveOrUpdateWmsErpAsnLineList } from '../../../api/asn'
   import {mapGetters} from 'vuex'
   import AsnHeadAdd from './AsnHeadAdd'
   import {Message} from 'element-ui'
+  import AsnLineAdd from './AsnLineAdd'
 
   export default {
     name: 'AsnHeadTable',
@@ -94,6 +96,7 @@
       this.initData()
     },
     components: {
+      AsnLineAdd,
       AsnHeadAdd,
       Pagination
     },
@@ -173,6 +176,7 @@
       confirmSubmit() {
         let t = JSON.parse(JSON.stringify(this.$refs.asnDialog.form))
         this.form = t
+        let headId
         if (this.form.isEmergency) {
           this.form.isEmergency = parseInt(this.form.isEmergency)
         }
@@ -208,9 +212,25 @@
             if (valid) {
               saveOrUpdateWmsErpAsnHead(this.form).then(res => {
                 if (res.code == 200) {
-                  Message.success(res.msg)
-                  this.dialogHeadVisible = false
-                  this.initData()
+                  headId = res.data
+                  for (let t of this.addOrderLineData) {
+                    t.headId = headId
+                  }
+
+                  deleteWmsErpAsnLineByHeadId(headId).then(res => {
+                    if (res.code == 200) {
+                      saveOrUpdateWmsErpAsnLineList(this.addOrderLineData).then(res => {
+                        this.dialogHeadVisible = false
+                        this.form = {}
+                        this.addOrderLineData = []
+                        // this.initData()
+                        //通知行信息更新
+                        this.notifyLineData()
+                        // this.$store.dispatch('inbound/setHeadId', headId)
+                        Message.success(res.msg)
+                      })
+                    }
+                  })
                 } else {
                   Message.error(res.msg)
                 }
@@ -236,12 +256,18 @@
         this.form = {}
         this.orderLineList = []
       },
+      getFromSon(data) {
+        this.addOrderLineData = data
+      },
       handleCurrentChange(val) {
         if (val != null) {
           let id = parseInt(val.headId)
           this.$store.dispatch('inbound/setAsnHeadId', id)
         }
       },
+      notifyLineData() {
+        this.$emit('notify', true)
+      }
     },
     computed: {
       ...mapGetters([
