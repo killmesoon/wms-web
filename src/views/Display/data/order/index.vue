@@ -63,7 +63,8 @@
 
 <script>
   import Pagination from '@/components/Pagination'
-  import { queryDocAutoNumber ,saveOrUpdateDocAutoNumber } from '../../../../api/data/docNumber'
+  import { queryDocAutoNumber ,saveOrUpdateDocAutoNumber, deleteDocAutoNumberById, deleteDocAutoNumberList } from '../../../../api/data/docNumber'
+  import {saveOrUpdateWmsDic} from '../../../../api/dic/dic'
   import { Message } from 'element-ui'
   import OrderDialog from './OrderDialog'
 
@@ -146,16 +147,23 @@
         } else {
           this.$refs.orderDialog.$refs.dialogForm.validate((valid) => {
             if (valid) {
-              saveOrUpdateDocAutoNumber(this.form).then(res => {
+              let t = {}
+              t.docFlag = true
+              t.dicId = this.form.dicId
+              saveOrUpdateWmsDic(t).then(res => {
                 if (res.code == 200) {
-                  Message.success(res.msg)
-                  this.dialogVisible = false
-                  this.initData()
-                } else {
-                  Message.error(res.msg)
+                  saveOrUpdateDocAutoNumber(this.form).then(res => {
+                    if (res.code == 200) {
+                      Message.success(res.msg)
+                      this.dialogVisible = false
+                      this.initData()
+                    } else {
+                      Message.error(res.msg)
+                    }
+                  }).catch(e => {
+                    Message.error(e)
+                  })
                 }
-              }).catch(e => {
-                Message.error(e)
               })
             } else {
               return false
@@ -181,7 +189,56 @@
         }
       },
       deleteOrderList() {
-
+        //批量删除
+        let selectList = this.$refs.table.selection
+        let headIdList = [] //初始化headIdList
+        for (let t of selectList) {
+          headIdList.push(t.id)
+        }
+        this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteDocAutoNumberList(headIdList).then(res => {
+            if (res.code == 200) {
+              Message.success('删除成功')
+              this.initData()
+            } else {
+              Message.error(res.msg)
+            }
+          }).catch(e => {
+            Message.error(e)
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+      },
+      deleteSupplier(data) {
+        this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteDocAutoNumberById(data.id).then(res => {
+            if (res.code == 200) {
+              Message.success(res.msg)
+              this.initData()
+            } else {
+              Message.error(res.msg)
+            }
+          }).catch(e => {
+            Message.error(e)
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
       }
     }
   }

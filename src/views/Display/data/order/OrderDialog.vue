@@ -1,12 +1,14 @@
 <template>
     <div>
-        <el-form :model="form" size="small" label-position="right" ref="dialogForm" :rules="rules" :inline="isFormInline">
+        <el-form :model="form" size="small" label-position="right" ref="dialogForm"
+                 :validate-on-rule-change="false"
+                 :rules="rules" :inline="isFormInline">
             <el-form-item v-if="flag"  label="快码"  :label-width="formLabelWidth">
                 <el-input v-model="form.lookupcode"   placeholder="请输入快码"  autocomplete="off">
                 </el-input>
             </el-form-item>
-            <el-form-item v-else  label="快码" prop="lookupcode" :rules="[{ required: true, message: '请选择快码', trigger: 'blur' }]" :label-width="formLabelWidth">
-                <el-input v-model="form.lookupcode" @focus="chooseDic" :readonly="disable" placeholder="请选择快码"  autocomplete="off">
+            <el-form-item v-else  label="快码" prop="lookupcode"   :label-width="formLabelWidth">
+                <el-input v-model="form.lookupcode" @click.native="chooseDic" ref="codeInput" :readonly="disable" placeholder="请选择快码"  autocomplete="off">
                 </el-input>
             </el-form-item>
             <el-form-item v-if="flag"  label="单据类型" :label-width="formLabelWidth">
@@ -29,7 +31,7 @@
                 <el-input v-model="form.prefix" placeholder="请输入前缀" autocomplete="off">
                 </el-input>
             </el-form-item>
-            <el-form-item v-else prop="prefix"  label="前缀" :rules="[{ required: true, message: '请输入前缀', trigger: 'blur' }]" :label-width="formLabelWidth">
+            <el-form-item v-else prop="prefix"  label="前缀" :label-width="formLabelWidth">
                 <el-input v-model="form.prefix" placeholder="请输入前缀" autocomplete="off">
                 </el-input>
             </el-form-item>
@@ -93,6 +95,7 @@
                                         label="操作">
                                     <template slot-scope="scope">
                                         <el-button type="primary" size="mini"
+                                                   :disabled="scope.row.docFlag"
                                                    icon="el-icon-plus"
                                                    @click="chooseCode(scope.row)"
                                         ></el-button>
@@ -108,7 +111,7 @@
 </template>
 
 <script>
-  import { queryWmsDicListExtList } from '../../../../api/dic/dic'
+  import { queryWmsDicListExtList , saveOrUpdateWmsDic } from '../../../../api/dic/dic'
   import { Message } from 'element-ui'
 
   export default {
@@ -136,6 +139,13 @@
           }
         }, 300);
       };
+      var checkLookCode = (rule, value, callback) => {
+        if (!value) {
+          callback(new Error('快码不能为空'));
+        } else {
+          callback()
+        }
+      };
       return {
         form: JSON.parse(JSON.stringify(this.data)),
         isFormInline: true,
@@ -155,7 +165,11 @@
         rules: {
           sequenceNum: [
             { required: true ,validator: checkSequenceNum, trigger: 'blur' }
-          ]
+          ],
+          lookupcode:[
+            {required: true, validator: checkLookCode, trigger: 'blur' }
+            ],
+          prefix: [{ required: true, message: '请输入前缀', trigger: 'blur' }]
         }
       }
     },
@@ -189,9 +203,17 @@
       },
       chooseCode(data) {
         //选择快码
-        this.form.lookupcode = data.dicTypeCode
-        this.form.docType = data.dicCode
-        this.form.docName = data.dicName
+        this.$nextTick(() => {
+          this.$set(this.form, 'lookupcode', data.dicTypeCode)
+          // this.form.lookupcode = data.dicTypeCode
+          this.form.docType = data.dicCode
+          this.form.docName = data.dicName
+          this.form.dicId = data.dicId
+          this.$refs.dialogForm.validateField('lookupcode')
+        })
+
+        // this.form.dicId = data.dicId
+
         this.dialogVisible = false
       }
     },
