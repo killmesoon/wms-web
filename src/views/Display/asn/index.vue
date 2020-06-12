@@ -6,7 +6,17 @@
         <div ref="lineDiv" class="line-view" />
 
         <div id="bottomView" ref="bottomView" class="bottom-view">
-            <asn-line-table ref="asnLineTable"></asn-line-table>
+            <el-tabs v-model="activeName">
+                <el-tab-pane name="first">
+                    <span slot="label"><i class="el-icon-user" /> 行信息</span>
+                    <asn-line-table ref="asnLineTable"></asn-line-table>
+                </el-tab-pane>
+                <el-tab-pane name="second">
+                    <span slot="label"><i class="el-icon-school" /> 明细信息</span>
+                    <asn-detail-table></asn-detail-table>
+                </el-tab-pane>
+            </el-tabs>
+
         </div>
     </div>
 </template>
@@ -15,9 +25,17 @@
 
   import AsnHeadTable from './AsnHeadTable'
   import AsnLineTable from './AsnLineTable'
+  import AsnDetailTable from './AsnDetailTable'
   export default {
     name: 'index',
-    components: { AsnLineTable, AsnHeadTable },
+    components: { AsnDetailTable, AsnLineTable, AsnHeadTable },
+    data() {
+      return {
+        activeName: 'first',
+        topViewHeightPercent: 0.5,
+        bottomViewHeightPercent: 0.5
+      }
+    },
     methods: {
       notifyLineData() {
         this.$refs.asnLineTable.initData()

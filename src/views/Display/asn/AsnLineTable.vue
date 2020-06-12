@@ -80,7 +80,7 @@
             />
         </div>
         <el-dialog :visible.sync="dialogDetailVisible" :title="dialogDetailTitle" width="60%" :close-on-click-modal="closeFlag" @close="resetAll">
-            <asn-detail-dialog :data="orderDetailList" :line="lineItem" @event1="getFromSon" ref="asnDetailDialog"></asn-detail-dialog>
+            <asn-detail-dialog  :data="orderDetailList" :line="lineItem" @event1="getFromSon" ref="asnDetailDialog"></asn-detail-dialog>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="dialogDetailVisible = false">取 消</el-button>
                 <el-button type="primary" @click="confirmSubmitDetail">确 定</el-button>
@@ -256,6 +256,9 @@
             if (res.code == 200) {
               that.tableData = res.data.records
               this.total =res.data.total
+              if (that.tableData.length > 0) {
+                this.lineItem = that.tableData[0]
+              }
               that.loading = false
             }
           })

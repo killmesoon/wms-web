@@ -195,7 +195,7 @@
     data() {
       return {
         dialogDetailVisible: false,
-        addOrderLineData: [],
+        addOrderLineData: JSON.parse(JSON.stringify(this.data)),
         isFormInline: true,
         isClose: false,
         applyToBody: true,
@@ -217,6 +217,7 @@
         let data = JSON.parse(JSON.stringify(this.formLine))
         data.lineId = this.lineItem.lineId
         data.headId = this.lineItem.headId
+        data.itemId = this.lineItem.itemId
         this.$refs.asnDetailLineForm.validate((valid) => {
           if (valid) {
             this.addOrderLineData.push(data)
@@ -245,7 +246,7 @@
     },
     watch: {
       data(current, old) {
-        this.addOrderLineData = current
+        this.addOrderLineData = JSON.parse(JSON.stringify(current))
       },
       line(current, old) {
         this.lineItem = current
