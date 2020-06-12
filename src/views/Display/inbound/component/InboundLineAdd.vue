@@ -187,7 +187,6 @@
         this.formLine.itemCode = e.itemCode
         this.formLine.description = e.description
         this.formLine.itemId = e.itemId
-        console.log(this.formLine)
       },
       wareHouseCodeChange(e) {
         this.formLine.warehouseCode = e.warehouseCode

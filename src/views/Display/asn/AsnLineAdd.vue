@@ -89,11 +89,8 @@
                 <el-form-item label="计划数量" prop="planQty" :rules="[{ required: true, message: '请输入计划数量', trigger: 'blur' }]" :label-width="formLabelWidth">
                     <el-input type="number"  v-model="formLine.planQty"  autocomplete="off" placeholder="请输入计划数量"></el-input>
                 </el-form-item>
-                <el-form-item label="来源单据行号" :label-width="formLabelWidth">
-                    <el-input type="number"  v-model="formLine.sourceLineNum" placeholder="请输入来源单据行号" autocomplete="off"></el-input>
-                </el-form-item>
                 <el-form-item label="来源单据号" :label-width="formLabelWidth">
-                    <el-input type="number"  v-model="formLine.sourceDocNum" placeholder="请输入来源单据号" autocomplete="off"></el-input>
+                    <el-input type="number"  v-model="formLine.sourceLine" placeholder="请输入来源单据号" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="备注" :label-width="formLabelWidth">
                     <el-input v-model="formLine.note" placeholder="请输入备注" autocomplete="off"></el-input>
@@ -221,10 +218,8 @@
         }
       },
       sourceDocTypeChange(e) {
-        // console.log(e)
-        this.formLine.sourceDocType = e.dicId
-        this.formLine.realSourceDocType = e.dicName
-        // this.formLine.sourceDocTypeItem = e.dicName
+        this.formLine.sourcePo = e.dicId
+        this.formLine.sourcePoDic = e.dicName
       },
       resetAll() {
         this.$refs.inboundOrderLineForm.resetFields()
