@@ -58,7 +58,7 @@ export function deleteWmsErpAsnHeadById(id) {
 }
 
 
-//---------------
+//--------line-------
 
 /**
  * 根据headId查询行信息
@@ -110,8 +110,32 @@ export function deleteWmsErpAsnLineByHeadId(headId) {
   })
 }
 
+/**
+ * 单挑删除行信息
+ * @param lineId
+ */
+export function deleteWmsErpAsnLineById(lineId) {
+  return request({
+    url: '/asnLine/wms-erp-asn-line/deleteWmsErpAsnLineById/' + lineId,
+    method: 'get'
+  })
+}
 
-//----------------
+/**
+ * 批量删除行信息
+ * @param data
+ */
+export function deleteWmsErpAsnLineList(data) {
+  return request({
+    url: '/asnLine/wms-erp-asn-line/deleteWmsErpAsnLineList',
+    method: 'post',
+    data
+  })
+}
+
+
+
+//-------detail--------
 
 /**
  * 查询明细信息list
@@ -131,9 +155,9 @@ export function queryWmsErpAsnDetailList(params, data) {
  * 批量插入明细信息
  * @param data
  */
-export function saveOrUpdateDetailList(data) {
+export function saveOrUpdateDetailList(lineId ,data) {
   return request({
-    url: '/asnDetail/wms-erp-asn-detail/saveOrUpdateDetailList',
+    url: '/asnDetail/wms-erp-asn-detail/saveOrUpdateDetailList/' + lineId,
     method: 'post',
     data
   })

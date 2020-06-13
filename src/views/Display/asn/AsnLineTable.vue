@@ -5,7 +5,7 @@
             <!--                              @getSelectedDate="getSelectedDate"/>-->
 
             <!--      <KeyWordSearch input-width="360px" place-holder="支持账户名、显示名称、手机号、邮箱快速搜索" @search="getSearchData" />-->
-            <el-button type="danger" size="mini" icon="el-icon-delete"> 批量删除</el-button>
+            <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteList"> 批量删除</el-button>
             <el-button type="primary" size="mini" icon="el-icon-plus" @click="dialogLineVisible = true"> 录入</el-button>
         </div>
         <div>
@@ -63,10 +63,12 @@
                 <el-table-column prop="note" label="备注">
                 </el-table-column>
                 <el-table-column
-                        width="90"
+                        width="120"
                         label="操作">
                     <template slot-scope="scope">
                         <el-button type="primary"  size="mini" icon="el-icon-plus" @click="addDetail(scope.row)">
+                        </el-button>
+                        <el-button type="danger"  size="mini" icon="el-icon-delete" @click="deleteLine(scope.row)">
                         </el-button>
                     </template>
                 </el-table-column>
@@ -158,7 +160,7 @@
   import { getItemList } from '../../../api/data/data'
   import { getWareHouseList } from '../../../api/model/warehouse'
   import { getUomList } from '../../../api/data/uom'
-  import { queryWmsErpAsnLineListByHeadId, queryWmsErpAsnDetailList, saveOrUpdateWmsErpAsnLine , saveOrUpdateDetailList } from '../../../api/asn'
+  import { queryWmsErpAsnLineListByHeadId, queryWmsErpAsnDetailList, saveOrUpdateWmsErpAsnLine , saveOrUpdateDetailList ,deleteWmsErpAsnLineById ,deleteWmsErpAsnLineList } from '../../../api/asn'
   import AsnDetailDialog from './AsnDetailDialog'
   export default {
     name: 'AsnLineTable',
@@ -321,13 +323,13 @@
         })
       },
       confirmSubmitDetail() {
-        console.log(this.orderDetailList)
         if (this.orderDetailList.length > 0) {
-          saveOrUpdateDetailList(this.orderDetailList).then(res => {
+          saveOrUpdateDetailList(this.lineItem.lineId ,this.orderDetailList).then(res => {
             if (res.code == 200) {
               Message.success(res.msg)
               this.dialogDetailVisible = false
               this.orderDetailList = []
+              this.$emit('changeTab', 'second')
             } else {
               Message.error(res.msg)
             }
@@ -350,6 +352,61 @@
       },
       getFromSon(data) {
         this.orderDetailList = data
+      },
+      deleteLine(data) {
+        //删除行信息 连带明细
+        this.$confirm('此操作将永久删除所选数据, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteWmsErpAsnLineById(data.lineId).then(res => {
+            if (res.code == 200) {
+              Message.success(res.msg)
+              this.$emit('changeTab', 'first')
+            } else {
+              Message.error(res.msg)
+            }
+          }).catch(e => {
+            Message.error(e)
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+
+      },
+      deleteList() {
+        //批量删除行信息 ，带明细
+        //删除行信息 连带明细
+        this.$confirm('此操作将永久删除所选数据, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          let selectList = this.$refs.table.selection
+          let lineIdList = [] //初始化headIdList
+          for (let t of selectList) {
+            lineIdList.push(t.lineId)
+          }
+          deleteWmsErpAsnLineList(lineIdList).then(res => {
+            if (res.code == 200) {
+              Message.success(res.msg)
+              this.$emit('changeTab', 'first')
+            } else {
+              Message.error(res.msg)
+            }
+          }).catch(e => {
+            Message.error(e)
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
       }
     },
     computed: {

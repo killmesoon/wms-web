@@ -282,11 +282,17 @@
               if (res.code == 200) {
                 Message.success(res.msg)
                 this.initData()
+                this.notifyLineData()
               } else {
                 Message.error(res.msg)
               }
             }).catch(e => {
               Message.error(e)
+            })
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消删除'
             })
           })
         } else {
@@ -310,6 +316,11 @@
             }
           }).catch(e => {
             Message.error(e)
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
           })
         })
       },

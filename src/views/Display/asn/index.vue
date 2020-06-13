@@ -9,11 +9,11 @@
             <el-tabs v-model="activeName">
                 <el-tab-pane name="first">
                     <span slot="label"><i class="el-icon-user" /> 行信息</span>
-                    <asn-line-table ref="asnLineTable"></asn-line-table>
+                    <asn-line-table @changeTab="changeToDetail" ref="asnLineTable"></asn-line-table>
                 </el-tab-pane>
                 <el-tab-pane name="second">
                     <span slot="label"><i class="el-icon-school" /> 明细信息</span>
-                    <asn-detail-table></asn-detail-table>
+                    <asn-detail-table ref="asnDetailTable"></asn-detail-table>
                 </el-tab-pane>
             </el-tabs>
 
@@ -39,6 +39,13 @@
     methods: {
       notifyLineData() {
         this.$refs.asnLineTable.initData()
+        this.$refs.asnDetailTable.initData()
+      },
+      changeToDetail(data) {
+        this.activeName = data
+        this.$refs.asnLineTable.initData()
+        this.$refs.asnDetailTable.initData()
+
       }
     }
   }

@@ -233,6 +233,7 @@
         for (let t of selectList) {
           this.addOrderLineData.splice(this.addOrderLineData.indexOf(t), 1)
         }
+        this.$emit('event1', JSON.parse(JSON.stringify(this.addOrderLineData)))
       },
       resetAll() {
         this.$refs.asnDetailLineForm.resetFields()
