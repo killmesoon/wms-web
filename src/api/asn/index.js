@@ -26,6 +26,14 @@ export function saveOrUpdateWmsErpAsnHead(data) {
   })
 }
 
+export function saveWmsErpAsnOrder(data) {
+  return request({
+    url: '/asnHead/wms-erp-asn-head/saveWmsErpAsnOrder',
+    method: 'post',
+    data
+  })
+}
+
 /**
  * 批量删除头信息
  * @param data

@@ -18,6 +18,10 @@
                         style="width: 100%"
                         @current-change="handleCurrentChange"
                 >
+                    <el-table-column
+                            type="selection"
+                            width="30">
+                    </el-table-column>
                     <el-table-column prop="asnNumber" label="单据号">
                     </el-table-column>
                     <el-table-column prop="asnTypeDic" label="单据类型">
@@ -39,13 +43,13 @@
                     </el-table-column>
                     <el-table-column prop="supplierName" label="供应商">
                     </el-table-column>
-                    <el-table-column prop="dcompanyName" label="送货单位">
+                    <el-table-column prop="dCompanyName" label="送货单位">
                     </el-table-column>
-                    <el-table-column prop="duserName" label="送货人">
+                    <el-table-column prop="dUserName" label="送货人">
                     </el-table-column>
-                    <el-table-column prop="dphone" label="联系电话">
+                    <el-table-column prop="dPhone" label="联系电话">
                     </el-table-column>
-                    <el-table-column prop="dshipNum" label="车船号">
+                    <el-table-column prop="dShipNum" label="车船号">
                     </el-table-column>
                     <el-table-column prop="note" label="备注">
                     </el-table-column>
@@ -54,7 +58,8 @@
                             width="180"
                             label="操作">
                         <template slot-scope="scope">
-                            <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteHeadOrder(scope.row)">
+                            <el-button type="danger" size="mini" icon="el-icon-delete"
+                                       @click="deleteHeadOrder(scope.row)">
                             </el-button>
                             <el-button type="primary" size="mini" icon="el-icon-edit" @click="editHeadOrder(scope.row)">
                             </el-button>
@@ -71,7 +76,8 @@
                 />
             </div>
         </div>
-        <el-dialog :visible.sync="dialogHeadVisible" :title="dialogTitle" width="50%" :close-on-click-modal="closeFlag" @close="resetAll">
+        <el-dialog :visible.sync="dialogHeadVisible" :title="dialogTitle" width="50%" :close-on-click-modal="closeFlag"
+                   @close="resetAll">
             <asn-head-add :data="form" :flag="searchFlag" ref="asnDialog"></asn-head-add>
             <asn-line-add :data="orderLineList" @event1="getFromSon" v-if="!searchFlag"></asn-line-add>
             <div slot="footer" class="dialog-footer">
@@ -84,10 +90,19 @@
 
 <script>
   import Pagination from '@/components/Pagination'
-  import { queryWmsErpAsnHeadList , saveOrUpdateWmsErpAsnHead ,deleteWmsErpAsnLineByHeadId ,saveOrUpdateWmsErpAsnLineList } from '../../../api/asn'
-  import {mapGetters} from 'vuex'
+  import {
+    queryWmsErpAsnHeadList,
+    saveOrUpdateWmsErpAsnHead,
+    deleteWmsErpAsnLineByHeadId,
+    saveOrUpdateWmsErpAsnLineList,
+    queryWmsErpAsnLineListByHeadId,
+    deleteWmsErpAsnHeadById,
+    deleteWmsErpAsnHeadList,
+    saveWmsErpAsnOrder
+  } from '../../../api/asn'
+  import { mapGetters } from 'vuex'
   import AsnHeadAdd from './AsnHeadAdd'
-  import {Message} from 'element-ui'
+  import { Message } from 'element-ui'
   import AsnLineAdd from './AsnLineAdd'
 
   export default {
@@ -167,6 +182,23 @@
         this.dialogHeadVisible = true
         this.searchFlag = false
       },
+      editHeadOrder(data) {
+        queryWmsErpAsnLineListByHeadId({
+          current: 1,
+          size: -1
+        }, data.headId).then(res => {
+          if (res.code == 200) {
+            this.form = data
+            this.form.asnStatus = parseInt(this.form.asnStatus)
+            this.form.asnType = parseInt(this.form.asnType)
+            this.form.sourceDocType = parseInt(this.form.sourceDocType)
+            this.form.isEmergency = this.form.isEmergency ? '1' : '0'
+            this.orderLineList = res.data.records
+            this.addOrderLineData = res.data.records
+            this.dialogHeadVisible = true
+          }
+        })
+      },
       searchInbound() {
         //查询
         this.dialogHeadVisible = true
@@ -201,7 +233,6 @@
                   let first = that.tableData[0]
                   this.$store.dispatch('inbound/setAsnHeadId', first.headId)
                 }
-
                 this.form = {}
               }
             })
@@ -210,27 +241,18 @@
         } else {
           this.$refs.asnDialog.$refs.asnOrderForm.validate((valid) => {
             if (valid) {
-              saveOrUpdateWmsErpAsnHead(this.form).then(res => {
+              saveWmsErpAsnOrder({
+                wmsErpAsnHead: this.form,
+                wmsErpAsnLines: this.addOrderLineData
+              }).then(res => {
                 if (res.code == 200) {
-                  headId = res.data
-                  for (let t of this.addOrderLineData) {
-                    t.headId = headId
-                  }
-
-                  deleteWmsErpAsnLineByHeadId(headId).then(res => {
-                    if (res.code == 200) {
-                      saveOrUpdateWmsErpAsnLineList(this.addOrderLineData).then(res => {
-                        this.dialogHeadVisible = false
-                        this.form = {}
-                        this.addOrderLineData = []
-                        // this.initData()
-                        //通知行信息更新
-                        this.notifyLineData()
-                        // this.$store.dispatch('inbound/setHeadId', headId)
-                        Message.success(res.msg)
-                      })
-                    }
-                  })
+                  this.dialogHeadVisible = false
+                  this.form = {}
+                  this.addOrderLineData = []
+                  this.initData()
+                  //通知行信息更新
+                  this.notifyLineData()
+                  Message.success(res.msg)
                 } else {
                   Message.error(res.msg)
                 }
@@ -244,10 +266,52 @@
         }
       },
       deleteOrderList() {
-
+        let selectList = this.$refs.table.selection
+        let headIdList = [] //初始化headIdList
+        for (let t of selectList) {
+          headIdList.push(t.headId)
+        }
+        if (headIdList.length > 0) {
+          //批量删除
+          this.$confirm('此操作将永久删除所选数据, 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            deleteWmsErpAsnHeadList(headIdList).then(res => {
+              if (res.code == 200) {
+                Message.success(res.msg)
+                this.initData()
+              } else {
+                Message.error(res.msg)
+              }
+            }).catch(e => {
+              Message.error(e)
+            })
+          })
+        } else {
+          Message.error('请至少选中一项')
+        }
       },
       deleteHeadOrder(data) {
-
+        //删除关联的头表行明细
+        this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteWmsErpAsnHeadById(data.headId).then(res => {
+            if (res.code == 200) {
+              Message.success(res.msg)
+              this.initData()
+              this.notifyLineData()
+            } else {
+              Message.error(res.msg)
+            }
+          }).catch(e => {
+            Message.error(e)
+          })
+        })
       },
       resetAll() {
         if (!this.searchFlag) {

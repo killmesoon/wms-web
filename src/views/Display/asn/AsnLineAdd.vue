@@ -25,11 +25,11 @@
             </el-table-column>
             <el-table-column prop="planQty" label="计划数量">
             </el-table-column>
-            <el-table-column width="120px" prop="realSourceDocType" label="来源单据类型">
+            <el-table-column width="120px" prop="sourcePoDic" label="来源单据类型">
             </el-table-column>
-            <el-table-column prop="sourceDocNum" label="单据号">
-            </el-table-column>
-            <el-table-column prop="sourceLineNum" label="单据行号">
+<!--            <el-table-column prop="sourceDocNum" label="单据号">-->
+<!--            </el-table-column>-->
+            <el-table-column prop="sourceLine" label="单据行号">
             </el-table-column>
             <el-table-column prop="note" label="备注">
             </el-table-column>
