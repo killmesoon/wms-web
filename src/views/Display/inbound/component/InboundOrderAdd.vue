@@ -8,13 +8,13 @@
                 </el-select>
             </el-form-item>
             <el-form-item v-else label="订单类型" :label-width="formLabelWidth" :rules="[{ required: true, message: '请选择订单类型', trigger: 'change' }]" prop="docType">
-                <el-select v-model="form.docType"  placeholder="请选择订单类型">
+                <el-select v-model="form.docType"  placeholder="请选择订单类型" @change="createAutoDoc">
                     <el-option v-for="item in dicInboundOrderTypeList" :key="item.dicCode" :label="item.dicName"
                                :value="item.dicId"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="订单号" :label-width="formLabelWidth">
-                <el-input v-model="form.docNumber" type="number" placeholder="请输入订单号" autocomplete="off"></el-input>
+                <el-input v-model="form.docNumber" :disabled="disable" placeholder="请选择类型自动生成" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item v-if="flag" label="订单状态" :label-width="formLabelWidth" >
                 <el-select v-model="form.docStatus" placeholder="请选择订单状态">
@@ -69,6 +69,7 @@
   import {mapGetters} from 'vuex'
   import {findSupplierList} from '../../../../api/data/supplier'
   import {Message} from 'element-ui'
+  import { getDocNumber } from '../../../../api/doc'
 
   export default {
     name: 'InboundOrderAdd',
@@ -81,6 +82,7 @@
         form: JSON.parse(JSON.stringify(this.data)),
         formLabelWidth: '100px',
         isFormInline: true,
+        disable: true,
         plantList: [
           {
             id: 1,
@@ -116,6 +118,19 @@
             }
           }]
         }
+      }
+    },
+    methods: {
+      createAutoDoc(e) {
+        getDocNumber(parseInt(e)).then(res => {
+          if (res.code == 200) {
+            this.$set(this.form, 'docNumber', res.data)
+          } else {
+            Message.error(res.msg)
+          }
+        }).catch(e => {
+          Message.error(e)
+        })
       }
     },
     computed: {

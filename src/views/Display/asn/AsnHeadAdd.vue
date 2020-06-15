@@ -189,8 +189,6 @@
         this.$set(this.form, 'supplierName', e.shortName)
       },
       createAutoDoc(e) {
-        queryWmsErpAsnHeadList().then(res => {
-            //为空
             getDocNumber(parseInt(e)).then(res => {
               if (res.code == 200) {
                 this.$set(this.form, 'asnNumber', res.data)
@@ -200,7 +198,6 @@
             }).catch(e => {
               Message.error(e)
             })
-        })
       }
     },
     computed: {

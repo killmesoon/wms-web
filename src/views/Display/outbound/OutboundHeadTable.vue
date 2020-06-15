@@ -198,8 +198,10 @@
             if (res.code == 200) {
               that.tableData = res.data.records
               that.loading = false
-              let first = that.tableData[0]
-              this.$store.dispatch('inbound/setOutboundHeadId', first.headId)
+              if (res.data.records.length > 0) {
+                let first = that.tableData[0]
+                this.$store.dispatch('inbound/setOutboundHeadId', first.headId)
+              }
             }
           })
           that.loading = false

@@ -188,9 +188,11 @@
               that.tableData = res.data.records
               this.total = res.data.total
               that.loading = false
-              if (this.headIdFlag == 0) {
-                let first = that.tableData[0]
-                this.$store.dispatch('inbound/setHeadId', first.headId)
+              if (res.data.records.length > 0) {
+                if (this.headIdFlag == 0) {
+                  let first = that.tableData[0]
+                  this.$store.dispatch('inbound/setHeadId', first.headId)
+                }
               }
             }
           })
@@ -383,6 +385,7 @@
       inboundAdd() {
         this.dialogHeadVisible = true
         this.searchFlag = false
+        this.dialogTitle = '入库单录入'
       },
       getFromSon(data) {
         this.addOrderLineData = data
