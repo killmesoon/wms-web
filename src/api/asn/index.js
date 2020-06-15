@@ -57,6 +57,17 @@ export function deleteWmsErpAsnHeadById(id) {
   })
 }
 
+/**
+ * 校验送货单号
+ * @param asnNumber
+ */
+export function checkAsnOrderExits(asnNumber) {
+  return request({
+    url: '/asnHead/wms-erp-asn-head/deleteWmsErpAsnHeadById/' + id,
+    method: 'get'
+  })
+}
+
 
 //--------line-------
 

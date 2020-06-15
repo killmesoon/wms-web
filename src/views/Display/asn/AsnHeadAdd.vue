@@ -7,14 +7,14 @@
                                :value="item.dicId"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item v-else label="订单类型" :label-width="formLabelWidth" :rules="[{ required: true, message: '请选择订单类型', trigger: 'change' }]" prop="asnType">
-                <el-select v-model="form.asnType"  placeholder="请选择订单类型">
+            <el-form-item v-else label="订单类型" :label-width="formLabelWidth"  :rules="[{ required: true, message: '请选择订单类型', trigger: 'change' }]" prop="asnType">
+                <el-select v-model="form.asnType"  placeholder="请选择订单类型" @change="createAutoDoc">
                     <el-option v-for="item in dicAsnOrderTypeList" :key="item.dicCode" :label="item.dicName"
                                :value="item.dicId"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="订单号" :label-width="formLabelWidth">
-                <el-input v-model.number="form.asnNumber"  placeholder="请输入订单号" autocomplete="off"></el-input>
+                <el-input v-model.number="form.asnNumber" :disabled="disable" placeholder="请选择类型自动生成" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item v-if="flag" label="订单状态" :label-width="formLabelWidth" >
                 <el-select v-model="form.asnStatus" placeholder="请选择订单状态">
@@ -117,6 +117,8 @@
 <script>
   import {mapGetters} from 'vuex'
   import { findSupplierList } from '../../../api/data/supplier'
+  import {queryWmsErpAsnHeadList} from '../../../api/asn'
+  import {getDocNumber} from '../../../api/doc'
   import { Message } from 'element-ui'
   export default {
     name: 'AsnHeadAdd',
@@ -151,6 +153,7 @@
             plantCode: 'WGQ1'
           }
         ],
+        disable: true,
         supplierList: [],
         //时间设置
         pickerOptions: {
@@ -184,6 +187,20 @@
       changeSupplier(e) {
         this.$set(this.form, 'supplierId', e.supplierId)
         this.$set(this.form, 'supplierName', e.shortName)
+      },
+      createAutoDoc(e) {
+        queryWmsErpAsnHeadList().then(res => {
+            //为空
+            getDocNumber(parseInt(e)).then(res => {
+              if (res.code == 200) {
+                this.$set(this.form, 'asnNumber', res.data)
+              } else {
+                Message.error(res.msg)
+              }
+            }).catch(e => {
+              Message.error(e)
+            })
+        })
       }
     },
     computed: {

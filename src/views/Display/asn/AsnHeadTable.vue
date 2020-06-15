@@ -98,7 +98,8 @@
     queryWmsErpAsnLineListByHeadId,
     deleteWmsErpAsnHeadById,
     deleteWmsErpAsnHeadList,
-    saveWmsErpAsnOrder
+    saveWmsErpAsnOrder,
+    checkAsnOrderExits
   } from '../../../api/asn'
   import { mapGetters } from 'vuex'
   import AsnHeadAdd from './AsnHeadAdd'
@@ -241,23 +242,31 @@
         } else {
           this.$refs.asnDialog.$refs.asnOrderForm.validate((valid) => {
             if (valid) {
-              saveWmsErpAsnOrder({
-                wmsErpAsnHead: this.form,
-                wmsErpAsnLines: this.addOrderLineData
-              }).then(res => {
-                if (res.code == 200) {
-                  this.dialogHeadVisible = false
-                  this.form = {}
-                  this.addOrderLineData = []
-                  this.initData()
-                  //通知行信息更新
-                  this.notifyLineData()
-                  Message.success(res.msg)
+              checkAsnOrderExits(this.form.asnNumber).then(res => {
+                if (res.data) {
+                  saveWmsErpAsnOrder({
+                    wmsErpAsnHead: this.form,
+                    wmsErpAsnLines: this.addOrderLineData
+                  }).then(res => {
+                    if (res.code == 200) {
+                      this.dialogHeadVisible = false
+                      this.form = {}
+                      this.addOrderLineData = []
+                      this.initData()
+                      //通知行信息更新
+                      this.notifyLineData()
+                      Message.success(res.msg)
+                    } else {
+                      Message.error(res.msg)
+                    }
+                  }).catch(e => {
+                    Message.error(e)
+                  })
                 } else {
-                  Message.error(res.msg)
+                  //重新生成订单
+                  Message.error("订单号重复，请重新生成")
+                  this.form = {}
                 }
-              }).catch(e => {
-                Message.error(e)
               })
             } else {
               return false
