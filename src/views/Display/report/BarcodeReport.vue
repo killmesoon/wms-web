@@ -15,32 +15,34 @@
                 <el-table-column prop="plantId" label="工厂">
 
                 </el-table-column>
-                <el-table-column prop="itemId" label="物料">
-
+                <el-table-column prop="dsequenceNum" label="钢板号">
                 </el-table-column>
-                <el-table-column prop="warehouseId" label="仓库">
-
+                <el-table-column prop="itemCode" label="物料编码">
                 </el-table-column>
-                <el-table-column prop="locatorId" label="货位">
-
+                <el-table-column prop="description" label="物料描述">
                 </el-table-column>
-                <el-table-column prop="loctOnhand" label="现有量">
-
+                <el-table-column prop="warehouseCode" label="仓库编码">
                 </el-table-column>
-                <el-table-column prop="lotNumber" label="批次">
-
+                <el-table-column prop="warehouseName" label="仓库简称">
                 </el-table-column>
-                <el-table-column prop="uomCode" label="单位">
-
+                <el-table-column width="120px" prop="weight" label="重量">
                 </el-table-column>
-                <el-table-column prop="mergeFlag" label="合并标识">
-
+                <el-table-column prop="weightUom" label="重量单位">
                 </el-table-column>
-                <el-table-column prop="ownerType" label="所有者类型">
-
+                <el-table-column prop="size" label="规格">
                 </el-table-column>
-                <el-table-column prop="ownerSiteId" label="所有者地址ID">
-
+                <el-table-column prop="thickness" label="厚度">
+                </el-table-column>
+                <el-table-column prop="sizeUom" label="尺寸单位">
+                </el-table-column>
+                <el-table-column prop="heatNumber" label="炉号">
+                </el-table-column>
+                <el-table-column prop="enableFlag" label="是否有效">
+                    <template slot-scope="scope">
+                        <span>{{scope.row.enableFlag ? 'Y' : 'N'}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="note" label="备注">
                 </el-table-column>
             </el-table>
             <pagination
@@ -57,6 +59,7 @@
 <script>
   import KeyWordSearch from '@/components/Search/KeyWordSearch'
   import Pagination from '@/components/Pagination'
+  import {queryWmsSglItemList} from '../../../api/report'
 
   export default {
     name: 'BarcodeReport',
@@ -95,15 +98,19 @@
       },
 
       initData() {
-        // queryQuantityList({
-        //   current: this.listQuery.page,
-        //   size: this.listQuery.limit
-        // }, {}).then(res => {
-        //   if (res.code == 200) {
-        //     this.tableData = res.data.records
-        //     this.total = res.data.total
-        //   }
-        // })
+        const that = this
+        this.loading = true
+        setTimeout(() => {
+          queryWmsSglItemList({
+            current: this.listQuery.page,
+            size: this.listQuery.limit
+          },{}).then(res => {
+            if (res.code == 200) {
+              that.tableData = res.data.records
+              that.loading = false
+            }
+          })
+        },500)
       }
     }
   }

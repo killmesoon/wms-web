@@ -13,3 +13,17 @@ export function queryQuantityList(params, data) {
     data
   })
 }
+
+/**
+ * 查询条码物料信息
+ * @param params
+ * @param data
+ */
+export function queryWmsSglItemList(params,data) {
+  return request({
+    url: '/sqlItem/wms-sgl-item/queryWmsSglItemList',
+    method: 'post',
+    params,
+    data
+  })
+}
