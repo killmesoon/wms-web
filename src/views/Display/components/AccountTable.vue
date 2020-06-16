@@ -212,6 +212,7 @@
           deleteHeadById(item.headId).then(res => {
             if (res.code == 200) {
               this.initData()
+              this.notifyLineData();
               Message.success(res.msg)
             } else {
               Message.error(res.msg)
@@ -245,6 +246,7 @@
             if (res.code == 200) {
               Message.success('删除成功') // 回头再优化
               this.initData()
+              this.notifyLineData();
             }
           }).catch(e => {
             Message.error(e)

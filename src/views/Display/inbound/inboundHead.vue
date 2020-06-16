@@ -120,6 +120,7 @@ export default {
     },
     notifyLineData() {
       this.$refs.accountTable2.initData()
+      this.$refs.inboundDetailTable.initData()
     },
     changeToDetail(data) {
       this.activeName = data
