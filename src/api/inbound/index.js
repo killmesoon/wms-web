@@ -41,6 +41,35 @@ export function findInboundDetailListByHeadId(params, headId) {
 }
 
 /**
+ * 查询明细信息list
+ * @param params
+ * @param data
+ */
+export function findInboundOrderDetailList(params, data) {
+  return request({
+    url: '/inboundDetail/wms-inbound-order-detail/findInboundOrderDetailList',
+    method: 'post',
+    params,
+    data
+  })
+}
+
+/**
+ * 根据行ID删除明细
+ * @param lineId
+ * @param data
+ */
+export function saveOrUpdateDetailList(lineId ,data) {
+  return request({
+    url: '/inboundDetail/wms-inbound-order-detail/saveOrUpdateDetailList/' + lineId,
+    method: 'post',
+    data
+  })
+}
+
+
+
+/**
  * 根据headId删除头信息
  * @param headId
  */

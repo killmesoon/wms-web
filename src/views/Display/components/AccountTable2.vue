@@ -6,7 +6,7 @@
 
             <!--      <KeyWordSearch input-width="360px" place-holder="支持账户名、显示名称、手机号、邮箱快速搜索" @search="getSearchData" />-->
             <el-button type="danger" size="mini" icon="el-icon-delete"> 批量删除</el-button>
-            <el-button type="primary" size="mini" icon="el-icon-plus" @click="lineAdd"> 录入</el-button>
+            <el-button type="primary" size="mini" icon="el-icon-plus" :disabled="headIdFlag == 0" @click="lineAdd"> 录入</el-button>
         </div>
         <div>
             <el-table
@@ -45,9 +45,11 @@
                 <el-table-column prop="note" label="备注">
                 </el-table-column>
                 <el-table-column
-                        width="90"
+                        width="120"
                         label="操作">
                     <template slot-scope="scope">
+                        <el-button type="primary"  size="mini" icon="el-icon-plus" @click="addDetail(scope.row)">
+                        </el-button>
                         <el-button type="danger"  size="mini" icon="el-icon-delete" @click="deleteLine(scope.row)">
                         </el-button>
                     </template>
@@ -128,6 +130,14 @@
                 <el-button type="primary" @click="addSingleLine">确 定</el-button>
             </div>
         </el-dialog>
+
+        <el-dialog :visible.sync="dialogDetailVisible" :title="dialogDetailTitle" width="60%" :close-on-click-modal="closeFlag" >
+            <inbound-detail-dialog :line="lineItem" @event1="getFromSon" ref="inboundDetailDialog" :data="orderDetailList"></inbound-detail-dialog>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogDetailVisible = false">取 消</el-button>
+                <el-button type="primary" @click="confirmSubmitDetail">确 定</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
@@ -135,15 +145,23 @@
   import DatePeriodSelect from '@/components/Search/DatePeriodSelect'
   import KeyWordSearch from '@/components/Search/KeyWordSearch'
   import Pagination from '@/components/Pagination'
-  import { findInboundLineListByHeadId, deleteLineById , saveOrUpdateOrderLine} from '../../../api/inbound'
+  import {
+    findInboundLineListByHeadId,
+    deleteLineById,
+    saveOrUpdateOrderLine,
+    findInboundOrderDetailList,
+    saveOrUpdateDetailList
+  } from '../../../api/inbound'
   import { mapGetters } from 'vuex'
   import { Message } from 'element-ui'
   import { getItemList } from '../../../api/data/data'
   import { getWareHouseList } from '../../../api/model/warehouse'
   import { getUomList } from '../../../api/data/uom'
+  import InboundDetailDialog from '../inbound/component/InboundDetailDialog'
 
   export default {
     components: {
+      InboundDetailDialog,
       DatePeriodSelect,
       Pagination,
       KeyWordSearch
@@ -173,12 +191,14 @@
         wareHouseList: [],
         uomList: [],
         applyToBody: true,
-        formLine: {
-          wareHouse: {
+        formLine: {},
+        addOrderLineData: [],
+        dialogDetailVisible: false,
+        dialogDetailTitle: '入库单明细录入',
+        closeFlag: false,
+        lineItem: {},
+        orderDetailList: []
 
-          }
-        },
-        addOrderLineData: []
       }
     },
 
@@ -265,6 +285,9 @@
             if (res.code == 200) {
               that.tableData = res.data.records
               this.total =res.data.total
+              if (that.tableData.length > 0) {
+                this.lineItem = that.tableData[0]
+              }
               that.loading = false
             }
           })
@@ -361,6 +384,44 @@
       },
       resetAll() {
         this.$refs.inboundLineForm.resetFields()
+      },
+
+    //  ------------------------
+
+      addDetail(data) {
+        console.log(data)
+        this.lineItem = data
+        findInboundOrderDetailList({
+          current: 1,
+          size: -1
+        }, data).then(res => {
+          if (res.code == 200) {
+            this.orderDetailList = res.data.records
+            this.dialogDetailVisible = true
+          } else {
+            Message.error(res.msg)
+          }
+        })
+      },
+
+      getFromSon(data) {
+        this.orderDetailList = data
+      },
+      confirmSubmitDetail() {
+        if (this.orderDetailList.length > 0) {
+          saveOrUpdateDetailList(this.lineItem.lineId ,this.orderDetailList).then(res => {
+            if (res.code == 200) {
+              Message.success(res.msg)
+              this.dialogDetailVisible = false
+              this.orderDetailList = []
+              this.$emit('changeTab', 'second')
+            } else {
+              Message.error(res.msg)
+            }
+          })
+        } else {
+          Message.error("请添加明细信息")
+        }
       }
     },
     computed: {

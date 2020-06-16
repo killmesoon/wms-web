@@ -332,7 +332,7 @@
                       this.dialogHeadVisible = false
                       this.form = {}
                       this.addOrderLineData = []
-                      // this.initData()
+                      this.initData()
                       //通知行信息更新
                       this.notifyLineData()
                       // this.$store.dispatch('inbound/setHeadId', headId)

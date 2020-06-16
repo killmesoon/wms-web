@@ -10,7 +10,7 @@
       <el-tabs v-model="activeName">
         <el-tab-pane name="first">
           <span slot="label"><i class="el-icon-user" /> 行信息</span>
-          <account-table2 ref="accountTable2" />
+          <account-table2 @changeTab="changeToDetail" ref="accountTable2" />
         </el-tab-pane>
         <el-tab-pane name="second">
           <span slot="label"><i class="el-icon-school" /> 明细信息</span>
@@ -120,6 +120,10 @@ export default {
     },
     notifyLineData() {
       this.$refs.accountTable2.initData()
+    },
+    changeToDetail(data) {
+      this.activeName = data
+      this.$refs.inboundDetailTable.initData()
     }
   }
 }

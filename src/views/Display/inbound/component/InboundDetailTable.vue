@@ -137,6 +137,7 @@
           },this.headIdFlag).then(res => {
             if (res.code == 200) {
               that.tableData = res.data.records
+              console.log(that.tableData)
               that.loading  = false
             }
           })
