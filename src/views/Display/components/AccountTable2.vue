@@ -329,6 +329,7 @@
             if (res.code == 200) {
               Message.success(res.msg)
               this.initData()
+              this.$emit('changeTab', 'first')
             } else {
               Message.error(res.msg)
             }
