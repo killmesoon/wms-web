@@ -45,9 +45,11 @@
                 <el-table-column prop="note" label="备注">
                 </el-table-column>
                 <el-table-column
-                        width="90"
+                        width="120"
                         label="操作">
                     <template slot-scope="scope">
+                        <el-button type="primary"  size="mini" icon="el-icon-plus" @click="addDetail(scope.row)">
+                        </el-button>
                         <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteLine(scope.row)">
                         </el-button>
                     </template>
@@ -127,6 +129,13 @@
                 <el-button type="primary" @click="addSingleLine">确 定</el-button>
             </div>
         </el-dialog>
+        <el-dialog :visible.sync="dialogDetailVisible" :title="dialogDetailTitle" width="60%" :close-on-click-modal="closeFlag" >
+            <outbound-detail-dialog :line="lineItem" @event1="getFromSon" ref="inboundDetailDialog" :data="orderDetailList"></outbound-detail-dialog>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogDetailVisible = false">取 消</el-button>
+                <el-button type="primary" @click="confirmSubmitDetail">确 定</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
@@ -139,11 +148,13 @@
   import { getItemList } from '../../../api/data/data'
   import { getWareHouseList } from '../../../api/model/warehouse'
   import { getUomList } from '../../../api/data/uom'
-  import {findOutboundOrderLineListByHeadId ,saveOrUpdateOutboundOrderLine , deleteOutboundLineById} from '../../../api/outbound/outbound'
+  import {findOutboundOrderLineListByHeadId ,saveOrUpdateOutboundOrderLine , deleteOutboundLineById, findOutboundOrderDetailList ,saveOrUpdateDetailList} from '../../../api/outbound/outbound'
+  import OutboundDetailDialog from './OutboundDetailDialog'
 
   export default {
     name: 'OutboundLineTable',
     components: {
+      OutboundDetailDialog,
       DatePeriodSelect,
       Pagination,
       KeyWordSearch
@@ -174,7 +185,12 @@
         applyToBody: true,
         formLine: {},
         addOrderLineData: [],
-        gridData: []
+        gridData: [],
+        dialogDetailVisible: false,
+        dialogDetailTitle: '出库单明细录入',
+        closeFlag: false,
+        lineItem: {},
+        orderDetailList: []
       }
     },
     created() {
@@ -332,6 +348,40 @@
       },
       resetAll() {
         this.$refs.outboundLineForm.resetFields()
+      },
+      addDetail(data) {
+        this.lineItem = data
+        findOutboundOrderDetailList({
+          current: 1,
+          size: -1
+        }, data).then(res => {
+          if (res.code == 200) {
+            this.orderDetailList = res.data.records
+            this.dialogDetailVisible = true
+          } else {
+            Message.error(res.msg)
+          }
+        })
+      },
+      getFromSon(data) {
+        this.orderDetailList = data
+      },
+      confirmSubmitDetail() {
+        //提交
+        if (this.orderDetailList.length > 0) {
+          saveOrUpdateDetailList(this.lineItem.lineId ,this.orderDetailList).then(res => {
+            if (res.code == 200) {
+              Message.success(res.msg)
+              this.dialogDetailVisible = false
+              this.orderDetailList = []
+              this.$emit('changeTab', 'second')
+            } else {
+              Message.error(res.msg)
+            }
+          })
+        } else {
+          Message.error("请添加明细信息")
+        }
       }
     },
     computed: {

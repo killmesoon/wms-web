@@ -111,3 +111,31 @@ export function findOutboundOrderDetailListByHeadId(params ,headId) {
     params
   })
 }
+
+/**
+ * 查询出库单详情
+ * @param params
+ * @param data
+ */
+export function findOutboundOrderDetailList(params,data) {
+  return request({
+    url: '/outboundDetail/wms-outbound-order-detail/findOutboundOrderDetailList',
+    method: 'post',
+    params,
+    data
+  })
+}
+
+/**
+ * 根据行ID删除明细
+ * @param lineId
+ * @param data
+ */
+export function saveOrUpdateDetailList(lineId ,data) {
+  return request({
+    url: '/outboundDetail/wms-outbound-order-detail/saveOrUpdateDetailList/' + lineId,
+    method: 'post',
+    data
+  })
+}
+

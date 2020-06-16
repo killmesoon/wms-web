@@ -9,11 +9,11 @@
             <el-tabs v-model="activeName">
                 <el-tab-pane name="first">
                     <span slot="label"><i class="el-icon-user"/> 行信息</span>
-                    <outbound-line-table ref="outboundLineTable"></outbound-line-table>
+                    <outbound-line-table @changeTab="changeToDetail" ref="outboundLineTable"></outbound-line-table>
                 </el-tab-pane>
                 <el-tab-pane name="second">
                     <span slot="label"><i class="el-icon-user"/> 明细信息</span>
-                    <outbound-detail-table></outbound-detail-table>
+                    <outbound-detail-table ref="outBoundDetailTable"></outbound-detail-table>
                 </el-tab-pane>
             </el-tabs>
         </div>
@@ -120,6 +120,11 @@
       },
       notifyLineData() {
         this.$refs.outboundLineTable.initData()
+        this.$refs.outBoundDetailTable.initData()
+      },
+      changeToDetail(data) {
+        this.activeName = data
+        this.$refs.outBoundDetailTable.initData()
       }
 
     }
