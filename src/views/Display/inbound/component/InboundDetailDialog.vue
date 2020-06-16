@@ -54,7 +54,7 @@
                     <el-input v-model="formLine.itemCode" :disabled="disable" autocomplete="off" />
                 </el-form-item>
                 <el-form-item label="物料描述" :label-width="formLabelWidth">
-                    <el-input v-model="formLine.description" :disabled="disable" autocomplete="off">
+                    <el-input v-model="formLine.itemDesc" :disabled="disable" autocomplete="off">
                     </el-input>
                 </el-form-item>
 
@@ -155,7 +155,7 @@
       detailLineAdd() {
         this.dialogDetailVisible = true
         this.$set(this.formLine, 'itemCode', this.lineItem.itemCode)
-        this.$set(this.formLine, 'description', this.lineItem.description)
+        this.$set(this.formLine, 'itemDesc', this.lineItem.description)
       },
       addSingleLine() {
         let data = JSON.parse(JSON.stringify(this.formLine))

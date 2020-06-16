@@ -389,7 +389,6 @@
     //  ------------------------
 
       addDetail(data) {
-        console.log(data)
         this.lineItem = data
         findInboundOrderDetailList({
           current: 1,
