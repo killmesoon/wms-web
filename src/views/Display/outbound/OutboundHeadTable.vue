@@ -12,7 +12,7 @@
 <!--                />-->
 <!--            </el-select>-->
             <!--      <KeyWordSearch input-width="360px" place-holder="支持账户名、显示名称、手机号、邮箱快速搜索" @search="getSearchData" />-->
-            <el-button type="danger" size="mini" icon="el-icon-delete"> 批量删除</el-button>
+            <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteHeadList"> 批量删除</el-button>
             <el-button type="primary" size="mini" icon="el-icon-plus" @click="outboundOrderAdd"> 录入</el-button>
             <el-button type="primary" size="mini" icon="el-icon-search" @click="searchOutbound">查询</el-button>
         </div>
@@ -95,7 +95,7 @@
   import Pagination from '@/components/Pagination'
   import OutboundOrderAdd from './OutboundOrderAdd'
   import OutboundLineAdd from './OutboundLineAdd'
-  import {getOutBoundOrderList , saveOrUpdateOutboundHead ,deleteOutboundOrderLinesByHeadId ,saveOrUpdateOutboundOrderLineList , deleteOutboundHeadByHeadId ,findOutboundOrderLineListByHeadId} from '../../../api/outbound/outbound'
+  import {getOutBoundOrderList , saveOrUpdateOutboundHead ,deleteOutboundOrderLinesByHeadId ,saveOrUpdateOutboundOrderLineList , deleteOutboundHeadByHeadId ,findOutboundOrderLineListByHeadId, deleteOutboundHeadList} from '../../../api/outbound/outbound'
   import { Message } from 'element-ui'
 
   export default {
@@ -287,6 +287,7 @@
           deleteOutboundHeadByHeadId(item.headId).then(res => {
             if (res.code == 200) {
               this.initData()
+              this.notifyLineData()
               Message.success(res.msg)
             } else {
               Message.error(res.msg)
@@ -300,6 +301,39 @@
             message: '已取消删除'
           })
         })
+      },
+      deleteHeadList() {
+        let selectList = this.$refs.table.selection
+        let headIdList = [] //初始化headIdList
+        for (let t of selectList) {
+          headIdList.push(t.headId)
+        }
+        if (headIdList.length > 0) {
+          this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            deleteOutboundHeadList(headIdList).then(res => {
+              if (res.code == 200) {
+                this.initData()
+                this.notifyLineData()
+                Message.success(res.msg)
+              } else {
+                Message.error(res.msg)
+              }
+            }).catch(e => {
+              Message.error(e)
+            })
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消删除'
+            })
+          })
+        } else {
+          Message.error("请至少选择一项")
+        }
       },
       outboundOrderAdd() {
         this.dialogHeadVisible = true

@@ -40,6 +40,18 @@ export function deleteOutboundOrderLinesByHeadId(headId) {
 }
 
 /**
+ * 批量删除头表信息
+ * @param data
+ */
+export function deleteOutboundHeadList(data) {
+  return request({
+    url: '/outboundHead/wms-outbound-order-head/deleteOutboundHeadList',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * 根据ID单挑删除
  * @param lineId
  */
