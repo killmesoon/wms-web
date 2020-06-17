@@ -51,6 +51,19 @@ export function deleteOutboundLineById(lineId) {
 }
 
 /**
+ * 批量删除行信息及明细
+ * @param data
+ */
+export function deleteOutboundOrderLineList(data) {
+  return request({
+    url: '/outboundLine/wms-outbound-order-line/deleteOutboundOrderLineList',
+    method: 'post',
+    data
+  })
+}
+
+
+/**
  * 批量插入行信息
  * @param data
  */

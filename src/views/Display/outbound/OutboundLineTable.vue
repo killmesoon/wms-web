@@ -5,7 +5,7 @@
 <!--                              @getSelectedDate="getSelectedDate"/>-->
 
             <!--      <KeyWordSearch input-width="360px" place-holder="支持账户名、显示名称、手机号、邮箱快速搜索" @search="getSearchData" />-->
-            <el-button type="danger" size="mini" icon="el-icon-delete"> 批量删除</el-button>
+            <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteLineList"> 批量删除</el-button>
             <el-button type="primary" size="mini" icon="el-icon-plus" @click="lineAdd"> 录入</el-button>
         </div>
         <div>
@@ -148,7 +148,7 @@
   import { getItemList } from '../../../api/data/data'
   import { getWareHouseList } from '../../../api/model/warehouse'
   import { getUomList } from '../../../api/data/uom'
-  import {findOutboundOrderLineListByHeadId ,saveOrUpdateOutboundOrderLine , deleteOutboundLineById, findOutboundOrderDetailList ,saveOrUpdateDetailList} from '../../../api/outbound/outbound'
+  import {findOutboundOrderLineListByHeadId ,saveOrUpdateOutboundOrderLine , deleteOutboundLineById, findOutboundOrderDetailList ,saveOrUpdateDetailList , deleteOutboundOrderLineList} from '../../../api/outbound/outbound'
   import OutboundDetailDialog from './OutboundDetailDialog'
 
   export default {
@@ -307,6 +307,7 @@
                 Message.success(res.msg)
                 this.dialogLineOrderVisible = false
                 this.initData()
+                this.$emit('changeTab', 'first')
                 this.formLine = {}
               } else {
                 Message.error(res.msg)
@@ -327,6 +328,7 @@
             if (res.code == 200) {
               Message.success(res.msg)
               this.initData()
+              this.$emit('changeTab', 'first')
             } else {
               Message.error(res.msg)
             }
@@ -338,7 +340,45 @@
               message: '已取消删除'
             })
           })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
         })
+      },
+      deleteLineList() {
+        let selectList = this.$refs.table.selection
+        let lineIdList = [] //初始化headIdList
+        for (let t of selectList) {
+          lineIdList.push(t.lineId)
+        }
+        if (lineIdList.length > 0) {
+          this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            deleteOutboundOrderLineList(lineIdList).then(res => {
+              if (res.code == 200) {
+                Message.success(res.msg)
+                this.initData()
+                this.$emit('changeTab', 'first')
+              } else {
+                Message.error(res.msg)
+              }
+            }).catch(e => {
+              Message.error(e)
+            })
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消删除'
+            })
+          })
+        } else {
+          Message.error('请至少选中一项')
+        }
       },
       handleCurrentChange(val) {
         this.$set(this.formLine, 'description',val.description)

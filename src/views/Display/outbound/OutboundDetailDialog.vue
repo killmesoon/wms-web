@@ -185,6 +185,7 @@
       },
       resetAll() {
         this.$refs.inboundDetailLineForm.resetFields()
+        this.formLine = {}
       }
     },
     watch: {
