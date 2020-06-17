@@ -51,7 +51,7 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column align="center" prop="qcOkQty" label="完成标识">
+                <el-table-column align="center" prop="completeFlag" label="完成标识">
                     <template slot-scope="scope">
                         <span>{{scope.row.completeFlag ? 'Y' : 'N'}}</span>
                     </template>
@@ -257,6 +257,12 @@
           }, this.asnHeadFlag).then(res => {
             if (res.code == 200) {
               that.tableData = res.data.records
+              for (let t of that.tableData) {
+                // receiveQty
+                if (t.planQty == t.receiveQty) {
+                  t.completeFlag = true
+                }
+              }
               this.total =res.data.total
               if (that.tableData.length > 0) {
                 this.lineItem = that.tableData[0]

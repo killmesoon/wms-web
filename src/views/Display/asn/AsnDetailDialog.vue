@@ -137,6 +137,13 @@
                     </el-input>
                 </el-form-item>
 
+                <el-form-item label="质检状态" :label-width="formLabelWidth">
+                    <el-select v-model="formLine.qcStatus">
+                        <el-option v-for="item in qcList" :key="item.id" :value="item.code" :label="item.code"></el-option>
+                    </el-select>
+                </el-form-item>
+
+
                 <el-form-item label="质保书号" :label-width="formLabelWidth">
                     <el-input v-model="formLine.qcReport"  autocomplete="off">
                     </el-input>
@@ -204,7 +211,17 @@
         uomList: [],
         itemList: [],
         disable: true,
-        lineItem: this.line
+        lineItem: this.line,
+        qcList: [
+          {
+            id: 1,
+            code: 'OK'
+          },
+          {
+            id: 2,
+            code: 'NG'
+          }
+        ]
       }
     },
     methods: {
