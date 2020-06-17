@@ -15,7 +15,8 @@ const state = {
   dicBarcodeTypeList: [],
   dicBarcodeStatusList: [],
   dicItemTypeList: [],
-  dicAsnOrderTypeList: []
+  dicAsnOrderTypeList: [],
+  dicCalculateTypeList: []
 }
 
 const mutations = {
@@ -60,6 +61,9 @@ const mutations = {
   },
   SET_ASN_ORDER_TYPE_LIST: (state, list) => {
     state.dicAsnOrderTypeList = list
+  },
+  SET_CALCULATE_TYPE_LIST: (state, list) => {
+    state.dicCalculateTypeList = list
   }
 
 }
@@ -83,6 +87,7 @@ const actions = {
         let dicBarcodeStatusList = [] //条码状态
         let dicItemTypeList = [] //物料类型
         let dicAsnOrderTypeList = [] //送货单类型
+        let dicCalculateTypeList = [] //事件计算类型
         for (let dic of data) {
           switch (dic.dicTypeId) {
             case 1:
@@ -105,6 +110,9 @@ const actions = {
               break
             case 7:
               dicSupplierStatusList.push(dic)
+              break
+            case 8:
+              dicCalculateTypeList.push(dic)
               break
             case 9:
               dicBarcodeTypeList.push(dic)
@@ -143,6 +151,7 @@ const actions = {
         commit('SET_BARCODE_STATUS_LIST', dicBarcodeStatusList)
         commit('SET_ITEM_TYPE_LIST', dicItemTypeList)
         commit('SET_ASN_ORDER_TYPE_LIST', dicAsnOrderTypeList)
+        commit('SET_CALCULATE_TYPE_LIST', dicCalculateTypeList)
         resolve()
       }).catch(error => {
         reject(error)

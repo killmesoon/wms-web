@@ -26,6 +26,7 @@ const getters = {
   dicBarcodeStatusList: state => state.dic.dicBarcodeStatusList,
   asnHeadFlag: state => state.inbound.asnHeadFlag,
   dicItemTypeList: state => state.dic.dicItemTypeList,
-  dicAsnOrderTypeList: state => state.dic.dicAsnOrderTypeList
+  dicAsnOrderTypeList: state => state.dic.dicAsnOrderTypeList,
+  dicCalculateTypeList: state => state.dic.dicCalculateTypeList
 }
 export default getters
