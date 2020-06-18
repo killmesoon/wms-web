@@ -36,6 +36,11 @@
                 </el-table-column>
                 <el-table-column prop="planQty" label="计划数量">
                 </el-table-column>
+                <el-table-column prop="planQty" align="center" label="执行数量">
+                    <template slot-scope="scope">
+                        <span>{{scope.row.execute_qty == null ? '-' : scope.row.execute_qty}}</span>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="realSourceDocType" label="来源单据类型">
                 </el-table-column>
                 <el-table-column prop="sourceDocNum" label="单据号">
