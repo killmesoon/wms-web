@@ -55,6 +55,7 @@
                         align="right"
                         type="date"
                         placeholder="选择日期"
+                        value-format="yyyy-MM-dd HH:mm:ss"
                         :picker-options="pickerOptions">
                 </el-date-picker>
             </el-form-item>

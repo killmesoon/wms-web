@@ -63,7 +63,7 @@ export function deleteWmsErpAsnHeadById(id) {
  */
 export function checkAsnOrderExits(asnNumber) {
   return request({
-    url: '/asnHead/wms-erp-asn-head/deleteWmsErpAsnHeadById/' + id,
+    url: '/asnHead/wms-erp-asn-head/checkAsnOrderExits/' + asnNumber,
     method: 'get'
   })
 }

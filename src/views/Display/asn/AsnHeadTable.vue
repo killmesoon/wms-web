@@ -163,7 +163,9 @@
               that.loading = false
               if (this.asnHeadFlag == 0) {
                 let first = that.tableData[0]
-                this.$store.dispatch('inbound/setAsnHeadId', first.headId)
+                if (first) {
+                  this.$store.dispatch('inbound/setAsnHeadId', first.headId)
+                }
               }
             }
           })
