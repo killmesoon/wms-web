@@ -49,12 +49,14 @@ service.interceptors.response.use(
 
       if (res.code !== 200) {
         Message({
-          message: res.message || 'Error',
+          message: res.msg || 'Error',
           type: 'error',
           duration: 3 * 1000
         })
-        return Promise.reject(new Error(res.message || 'Error'))
-      } else {
+        return Promise.reject(new Error(res.msg || 'Error'))
+      }
+
+       else {
         return res
       }
     } else {
