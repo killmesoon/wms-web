@@ -52,3 +52,15 @@ export function deleteSupplierList(data) {
     data
   })
 }
+
+/**
+ *
+ * @param data
+ */
+export function checkSupplierExits(data) {
+  return request({
+    url: '/supplier/wms-supplier/checkSupplierExits',
+    method: 'post',
+    data
+  })
+}

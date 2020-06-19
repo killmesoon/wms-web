@@ -1,11 +1,11 @@
 <template>
     <div>
-        <el-form :model="form" size="small" label-position="right" ref="supplierForm" :inline="isFormInline">
+        <el-form :model="form" size="small" label-position="right" :rules="rules" ref="supplierForm" :inline="isFormInline">
             <el-form-item v-if="flag" label="供应商编码" :label-width="formLabelWidth">
                 <el-input v-model="form.supplierCode" placeholder="请定义供应商编码" autocomplete="off">
                 </el-input>
             </el-form-item>
-            <el-form-item v-else label="供应商编码" prop="supplierCode" :label-width="formLabelWidth" :rules="[{ required: true, message: '请定义供应商编码', trigger: 'blur' }]">
+            <el-form-item v-else label="供应商编码" prop="supplierCode" :label-width="formLabelWidth" >
                 <el-input v-model="form.supplierCode" placeholder="请定义供应商编码" autocomplete="off">
                 </el-input>
             </el-form-item>
@@ -43,10 +43,10 @@
                 <el-input v-model="form.address" placeholder="请输入供应商地址" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item v-if="!flag" label="联系人" :label-width="formLabelWidth">
-                <el-input v-if="!flag" v-model="form.contact" placeholder="请输入联系人" autocomplete="off"></el-input>
+                <el-input  v-model="form.contact" placeholder="请输入联系人" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item v-if="!flag" label="联系电话" :label-width="formLabelWidth">
-                <el-input v-if="!flag" v-model="form.phone" placeholder="请输入联系电话" autocomplete="off"></el-input>
+                <el-input  v-model="form.phone" placeholder="请输入联系电话" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item v-if="!flag" label="邮箱" :label-width="formLabelWidth">
                 <el-input v-model="form.mail" autocomplete="off" placeholder="请输入邮箱"></el-input>
@@ -60,18 +60,50 @@
 
 <script>
   import { mapGetters } from 'vuex'
+  import { checkSupplierExits} from '../../../../api/data/supplier'
+  import { Message } from 'element-ui'
 
   export default {
     name: 'SupplierDialog',
     props: {
       data: Object,
-      flag: Boolean
+      flag: Boolean,
+      editFlag: Boolean
     },
     data() {
+      var checkSupplierCode = (rule, value, callback) => {
+        if (!value) {
+          return callback(new Error('请定义供应商编码'))
+        }
+        if (this.editFlag) {
+          callback()
+        } else {
+          setTimeout(() => {
+            //校验物料编码是否存在
+            checkSupplierExits({
+              supplierCode: value
+            }).then(res => {
+              if (res.data) {
+                //存在相同
+                callback()
+              } else {
+                return callback(new Error('该供应商编码已存在'))
+              }
+            }).catch(e => {
+              Message.error(e)
+            })
+          }, 500)
+        }
+      }
       return {
         form: JSON.parse(JSON.stringify(this.data)),
         isFormInline: true,
-        formLabelWidth: '100px'
+        formLabelWidth: '100px',
+        rules: {
+          supplierCode: [
+            { required: true, validator: checkSupplierCode, trigger: 'blur' }
+          ]
+        }
       }
     },
     computed: {
@@ -86,6 +118,9 @@
       },
       flag(current, old) {
         this.flag = current
+      },
+      editFlag(current, old) {
+        this.editFlag = current
       }
     }
   }
