@@ -52,3 +52,15 @@ export function deleteByIdList(data) {
     data
   })
 }
+
+/**
+ * 校验物料编码是否存在
+ * @param data
+ */
+export function checkItemCodeExits(data) {
+  return request({
+    url: '/item/wms-item/checkItemCodeExits',
+    method: 'post',
+    data
+  })
+}

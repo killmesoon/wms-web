@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-form :model="form" size="small" label-position="right" ref="itemForm" :inline="isFormInline">
+        <el-form :model="form" size="small" :rules="rules" label-position="right" ref="itemForm" :inline="isFormInline">
             <el-form-item v-if="flag" label="工厂编码" :label-width="formLabelWidth">
                 <el-select v-model="form.plantId" placeholder="请选择工厂编码">
                     <el-option v-for="item in plantList" :key="item.id" :label="item.plantName"
@@ -17,7 +17,7 @@
                 <el-input v-model="form.itemCode" placeholder="请定义物料编码" autocomplete="off">
                 </el-input>
             </el-form-item>
-            <el-form-item v-else prop="itemCode" :rules="[{ required: true, message: '请定义物料编码', trigger: 'change' }]" label="物料编码" :label-width="formLabelWidth">
+            <el-form-item v-else prop="itemCode"  label="物料编码" :label-width="formLabelWidth">
                 <el-input v-model="form.itemCode" placeholder="请定义物料编码" autocomplete="off">
                 </el-input>
             </el-form-item>
@@ -142,13 +142,15 @@
 <script>
     import {getUomList} from '../../../../api/data/uom'
     import {getWareHouseList} from '../../../../api/model/warehouse'
+    import {checkItemCodeExits} from '../../../../api/data/data'
     import { mapGetters } from 'vuex'
     import {Message} from 'element-ui'
   export default {
     name: 'ItemDialog',
     props: {
       data: Object,
-      flag: Boolean
+      flag: Boolean,
+      editFlag: Boolean
     },
     created() {
       getUomList({
@@ -182,6 +184,30 @@
       })
     },
     data() {
+      var checkItemCode = (rule, value, callback) => {
+        if (!value) {
+          return callback(new Error('请定义供应商编码'))
+        }
+        if (this.editFlag) {
+          callback()
+        } else {
+          setTimeout(() => {
+            //校验物料编码是否存在
+            checkItemCodeExits({
+              supplierCode: value
+            }).then(res => {
+              if (res.data) {
+                //存在相同
+                callback()
+              } else {
+                return callback(new Error('该供应商编码已存在'))
+              }
+            }).catch(e => {
+              Message.error(e)
+            })
+          }, 500)
+        }
+      }
       return {
         form: JSON.parse(JSON.stringify(this.data)),
         isFormInline: true,
@@ -195,7 +221,12 @@
           }
         ],
         uomList: [],
-        warehouseList: []
+        warehouseList: [],
+        rules:{
+          itemCode: [
+            { required: true, validator: checkItemCode, trigger: 'blur' }
+          ]
+        }
       }
     },
     computed: {
@@ -205,11 +236,27 @@
       ])
     },
     watch: {
-      data(current, old) {
-        this.form = JSON.parse(JSON.stringify(current))
+      data: {
+        immediate: true,
+        handler: function(current, old) {
+          if (JSON.stringify(current) == '{}') {
+            this.form = JSON.parse(JSON.stringify(current))
+          } else {
+            this.form = JSON.parse(JSON.stringify(current))
+            this.form.primaryUom = parseInt(this.form.primaryUom)
+            this.form.rcvWarehouseCode = parseInt(this.form.rcvWarehouseCode)
+            this.form.invWarehouseCode = parseInt(this.form.invWarehouseCode)
+            this.form.itemType = parseInt(this.form.itemType)
+            this.form.enableFlag = this.form.enableFlag ? '1' : '0'
+            this.form.iqcFlag = this.form.iqcFlag ? '1' : '0'
+          }
+        }
       },
       flag(current, old) {
         this.flag = current
+      },
+      editFlag(current, old) {
+        this.editFlag = current
       }
     }
   }

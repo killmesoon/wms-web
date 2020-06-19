@@ -1,6 +1,6 @@
 <template>
 <div class="white-body-view">
-    <el-button type="danger"  size="mini" icon="el-icon-delete" @click="deleteOrderList"> 批量删除</el-button>
+    <el-button type="danger"  size="mini" icon="el-icon-delete" @click="deleteOrderList" disabled> 批量删除</el-button>
     <el-button type="primary" size="mini" icon="el-icon-plus" @click="supplierAdd"> 录入</el-button>
     <el-button type="primary" size="mini" icon="el-icon-search" @click="searchData"> 查询</el-button>
     <div>
@@ -77,6 +77,7 @@
                         <el-button type="primary" size="mini" icon="el-icon-edit"
                                    @click="editSupplier(scope.row)"></el-button>
                         <el-button type="danger" size="mini" icon="el-icon-delete"
+                                   disabled
                                    @click="deleteSupplier(scope.row)"
                         ></el-button>
                     </template>
@@ -135,6 +136,7 @@
         form: {},
         tableHeight: 500,
         searchFlag: false,
+        editFlag: false
       }
     },
     methods: {
@@ -213,13 +215,8 @@
       editSupplier(data) {
         this.searchFlag = false
         this.dialogVisible = true
+        this.editFlag = true
         this.form = JSON.parse(JSON.stringify(data))
-        this.form.primaryUom = parseInt(this.form.primaryUom)
-        this.form.rcvWarehouseCode = parseInt(this.form.rcvWarehouseCode)
-        this.form.invWarehouseCode = parseInt(this.form.invWarehouseCode)
-        this.form.itemType = parseInt(this.form.itemType)
-        this.form.enableFlag = this.form.enableFlag ? '1' : '0'
-        this.form.iqcFlag = this.form.iqcFlag ? '1' : '0'
         this.dialogTitle = '编辑物料'
       },
       deleteOrderList() {
