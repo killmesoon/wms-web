@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-form :model="form" size="small" ref="warehouseForm" label-position="right" :inline="isFormInline">
+        <el-form :model="form" :rules="rules" size="small" ref="warehouseForm" label-position="right" :inline="isFormInline">
             <el-form-item v-if="flag" label="工厂编码" :label-width="formLabelWidth">
                 <el-select v-model="form.plantCode" placeholder="请选择工厂编码" @change="plantChange" value-key="plantId">
                     <el-option
@@ -57,8 +57,8 @@
             <el-form-item label="仓库编码" :label-width="formLabelWidth" v-if="flag">
                 <el-input v-model="form.warehouseCode" placeholder="请定义仓库编码" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item v-else label="仓库编码" :label-width="formLabelWidth" prop="warehouseCode"
-                          :rules="[{ required: true, message: '请输入仓库编码', trigger: 'blur' }]">
+            <el-form-item v-else label="仓库编码" prop="warehouseCode" :label-width="formLabelWidth"
+                          >
                 <el-input v-model="form.warehouseCode" placeholder="请定义仓库编码" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item label="是否盘点" :label-width="formLabelWidth" v-if="flag">
@@ -110,14 +110,41 @@
 
 <script>
   import { mapGetters } from 'vuex'
+  import {checkWarehouseCodeExits} from '../../../../api/model/warehouse'
+  import {Message} from 'element-ui'
 
   export default {
     name: 'WarehouseDialog',
     props: {
       data: Object,
-      flag: Boolean
+      flag: Boolean,
+      editFlag: Boolean
     },
     data() {
+      var checkWarehouseCode = (rule, value, callback) => {
+        if (!value) {
+          return callback(new Error('请定义仓库编码'));
+        }
+        if (this.editFlag) {
+          callback()
+        } else {
+          setTimeout(() => {
+            //校验物料编码是否存在
+            checkWarehouseCodeExits({
+              warehouseCode: value
+            }).then(res => {
+              if (res.data) {
+                //存在相同
+                callback()
+              } else {
+                return callback(new Error('该仓库编码已存在'));
+              }
+            }).catch(e => {
+              Message.error(e)
+            })
+          }, 500);
+        }
+      };
       return {
         form: JSON.parse(JSON.stringify(this.data)),
         isFormInline: true,
@@ -130,12 +157,16 @@
             plantName: '上海外高桥一厂',
             plantCode: 'WGQ1'
           }
-        ]
+        ],
+        rules: {
+          warehouseCode: [
+            { required: true, validator: checkWarehouseCode, trigger: 'blur' }
+          ]
+        }
       }
     },
     methods: {
       plantChange(item) {
-        console.log(item)
         this.form.plantName = item.plantName
       }
     },
@@ -146,11 +177,30 @@
       ])
     },
     watch: {
-      data(current, old) {
-        this.form = JSON.parse(JSON.stringify(current))
+      data: {
+        immediate: true,
+        handler: function(current, old) {
+          console.log(current)
+            this.form = JSON.parse(JSON.stringify(current))
+          if (this.form.enableFlag != null) {
+            this.form.enableFlag = this.form.enableFlag ? '1' : '0'
+          }
+          if (this.form.negativeFlag != null) {
+            this.form.negativeFlag = this.form.negativeFlag ? '1' : '0'
+          }
+          if (this.form.panrangeFlag != null) {
+            this.form.panrangeFlag = this.form.panrangeFlag ? '1' : '0'
+          }
+          if (this.form.warehouseType != null) {
+            this.form.warehouseType = parseInt(this.form.warehouseType)
+          }
+        }
       },
       flag(current, old) {
         this.flag = current
+      },
+      editFlag(current, old) {
+        this.editFlag = current
       }
     }
   }

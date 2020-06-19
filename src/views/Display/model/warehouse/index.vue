@@ -80,7 +80,7 @@
             />
         </div>
         <el-dialog :visible.sync="dialogVisible" :title="dialogTitle" width="55%" @close="resetAll" :close-on-click-modal="closeFlag">
-            <warehouse-dialog :data="form" :flag="searchFlag" ref="warehouseDialog"></warehouse-dialog>
+            <warehouse-dialog :data="form" :flag="searchFlag" :edit-flag="editFlag" ref="warehouseDialog"></warehouse-dialog>
             <div slot="footer">
                 <el-button @click="cancelAdd">取 消</el-button>
                 <el-button type="primary" @click="confirmSubmit">确 定</el-button>
@@ -137,7 +137,8 @@
         dialogTitle: '新增仓库',
         form: {},
         tableHeight: 500,
-        searchFlag: false
+        searchFlag: false,
+        editFlag: false
       }
     },
     created() {
@@ -173,8 +174,8 @@
 
       supplierAdd() {
         this.dialogVisible = true
-        this.form = {}
         this.searchFlag = false
+        this.dialogTitle = "仓库录入"
       },
       cancelAdd() {
         this.dialogVisible = false
@@ -208,9 +209,10 @@
                 Message.error(e)
             })
         } else {
+          let data = JSON.parse(JSON.stringify(this.form))
           this.$refs.warehouseDialog.$refs.warehouseForm.validate((valid) => {
             if (valid) {
-              saveOrUpdateWarehouse(this.form).then(res => {
+              saveOrUpdateWarehouse(data).then(res => {
                 if (res.code == 200) {
                   Message.success(res.msg)
                   this.form = {}
@@ -310,16 +312,15 @@
       editSupplier(data) {
         this.searchFlag = false
         this.dialogVisible = true
+        this.editFlag = true
         this.form = JSON.parse(JSON.stringify(data))
-        this.form.enableFlag = this.form.enableFlag ? '1' : '0'
-        this.form.negativeFlag = this.form.negativeFlag ? '1' : '0'
-        this.form.panrangeFlag = this.form.panrangeFlag ? '1' : '0'
         this.dialogTitle = '编辑仓库'
       },
       resetAll() {
         if (!this.searchFlag) {
           this.$refs.warehouseDialog.$refs.warehouseForm.resetFields()
         }
+        this.form = {}
       }
     }
   }

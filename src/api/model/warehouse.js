@@ -67,3 +67,15 @@ export function ifWarehouseListDelete(data) {
     data
   })
 }
+
+/**
+ * 校验仓库编码是否存在
+ * @param data
+ */
+export function checkWarehouseCodeExits(data) {
+  return request({
+    url: '/warehouse/wms-warehouse/checkWarehouseCodeExits',
+    method: 'post',
+    data
+  })
+}
