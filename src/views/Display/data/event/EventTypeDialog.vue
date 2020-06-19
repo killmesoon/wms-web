@@ -52,7 +52,7 @@
 
 
             <el-form-item v-if="!flag"  label="是否系统录入" prop="isSystem"  :rules="[{ required: true, message: '请选择是否系统录入', trigger: 'change' }]" :label-width="formLabelWidth">
-                <el-select v-model="form.isSystem" placeholder="是否系统录入">
+                <el-select v-model="form.isSystem" placeholder="是否系统录入" disabled>
                     <el-option v-for="item in dicYNList" :key="item.dicCode" :label="item.dicName"
                                :value="item.dicCode"></el-option>
                 </el-select>
@@ -109,8 +109,12 @@
       ])
     },
     watch: {
-      data(current, old) {
-        this.form = JSON.parse(JSON.stringify(current))
+      data: {
+        immediate: true,
+        handler: function(current, old) {
+          this.form = JSON.parse(JSON.stringify(current))
+          this.$set(this.form, 'isSystem', '0')
+        }
       },
       flag(current, old) {
         this.flag = current
