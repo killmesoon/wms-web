@@ -43,7 +43,7 @@
                 </el-table-column>
                 <el-table-column prop="areaTypeDic" label="区域类型">
                 </el-table-column>
-                <el-table-column prop="locatorCode" label="货位编码">
+                <el-table-column prop="locatorCodeAuto" label="货位编码">
                 </el-table-column>
                 <el-table-column prop="locatorName" label="货位名称">
                 </el-table-column>
@@ -81,9 +81,9 @@
         </div>
         <el-dialog :visible.sync="dialogVisible" width="50%" :close-on-click-modal="closeFlag" @close="resetAll">
             <div slot="title" class="dialog-head">{{dialogTitle}}</div>
-            <locator-dialog :data="form" :flag="searchFlag"  ref="dialogData"></locator-dialog>
+            <locator-dialog :data="form" :flag="searchFlag" :edit-flag="editFlag"  ref="dialogData"></locator-dialog>
             <div slot="footer">
-                <el-button @click="cancelAdd">取 消</el-button>
+                <el-button @click="dialogVisible = false">取 消</el-button>
                 <el-button type="primary" @click="confirmSubmit">确 定</el-button>
             </div>
         </el-dialog>
@@ -127,12 +127,10 @@
         total: 4,
         dialogVisible: false,
         dialogTitle: '新增货位',
-        form: {
-          wareHouse: {},
-          area: {}
-        },
-        tableHeight: 500,
-        searchFlag: false
+        form: {},
+        tableHeight: '70%',
+        searchFlag: false,
+        editFlag: false
       }
     },
     created() {
@@ -297,10 +295,8 @@
       editSupplier(data) {
         this.searchFlag = false
         this.dialogVisible = true
+        this.editFlag = true
         this.form = JSON.parse(JSON.stringify(data))
-        this.form.enableFlag = this.form.enableFlag ? '1' : '0'
-        this.form.areaType = parseInt(this.form.locatorType)
-        console.log(this.form)
         this.dialogTitle = '编辑货位'
       },
       resetAll() {

@@ -48,3 +48,15 @@ export function deleteLocatorById(id) {
     method: 'get',
   })
 }
+
+/**
+ * 验证货位是否存在重复
+ * @param data
+ */
+export function checkLocatorCodeExits(data) {
+  return request({
+    url: '/locator/wms-locator/checkLocatorCodeExits',
+    method: 'post',
+    data
+  })
+}

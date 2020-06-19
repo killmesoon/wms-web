@@ -77,7 +77,7 @@
             <div slot="title" class="dialog-head">{{dialogTitle}}</div>
             <area-dialog :data="form" :flag="searchFlag" :edit-flag="editFlag" ref="dialogArea"></area-dialog>
             <div slot="footer">
-                <el-button @click="cancelAdd">取 消</el-button>
+                <el-button @click="dialogVisible = false">取 消</el-button>
                 <el-button type="primary" @click="confirmSubmit">确 定</el-button>
             </div>
         </el-dialog>
@@ -165,9 +165,6 @@
         this.form = {}
         this.dialogTitle = '新增区域'
         this.searchFlag = false
-      },
-      cancelAdd() {
-        this.dialogVisible = false
       },
       confirmSubmit() {
         // console.log(this.$refs.dialogData.form)

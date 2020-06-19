@@ -82,7 +82,7 @@
         <el-dialog :visible.sync="dialogVisible" :title="dialogTitle" width="55%" @close="resetAll" :close-on-click-modal="closeFlag">
             <warehouse-dialog :data="form" :flag="searchFlag" :edit-flag="editFlag" ref="warehouseDialog"></warehouse-dialog>
             <div slot="footer">
-                <el-button @click="cancelAdd">取 消</el-button>
+                <el-button @click="dialogVisible = false">取 消</el-button>
                 <el-button type="primary" @click="confirmSubmit">确 定</el-button>
             </div>
         </el-dialog>
@@ -176,10 +176,6 @@
         this.dialogVisible = true
         this.searchFlag = false
         this.dialogTitle = "仓库录入"
-      },
-      cancelAdd() {
-        this.dialogVisible = false
-        this.form = {}
       },
       confirmSubmit() {
         let t = JSON.parse(JSON.stringify(this.$refs.warehouseDialog.form))
