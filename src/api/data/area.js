@@ -72,3 +72,15 @@ export function isWarehouseAreaListDelete(data) {
   })
 }
 
+/**
+ * 验证区域编码是否存在
+ * @param data
+ */
+export function checkAreaCodeExits(data) {
+  return request({
+    url: '/area/wms-warehouse-area/checkAreaCodeExits',
+    method: 'post',
+    data
+  })
+}
+

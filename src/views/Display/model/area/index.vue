@@ -75,7 +75,7 @@
         </div>
         <el-dialog :visible.sync="dialogVisible" width="50%" :close-on-click-modal="closeFlag" @close="resetAll">
             <div slot="title" class="dialog-head">{{dialogTitle}}</div>
-            <area-dialog :data="form" :flag="searchFlag" ref="dialogArea"></area-dialog>
+            <area-dialog :data="form" :flag="searchFlag" :edit-flag="editFlag" ref="dialogArea"></area-dialog>
             <div slot="footer">
                 <el-button @click="cancelAdd">取 消</el-button>
                 <el-button type="primary" @click="confirmSubmit">确 定</el-button>
@@ -126,7 +126,8 @@
         dialogTitle: '新增区域',
         form: {},
         tableHeight: 500,
-        searchFlag: false
+        searchFlag: false,
+        editFlag: false
       }
     },
     created() {
@@ -291,12 +292,9 @@
       },
       editSupplier(data) {
         this.searchFlag = false
+        this.editFlag = true
         this.dialogVisible = true
         this.form = JSON.parse(JSON.stringify(data))
-        // this.$set(this.form, 'wareHouse', {
-        //   warehouseCode: data.warehouseCode
-        // })
-        this.form.enableFlag = this.form.enableFlag ? '1' : '0'
         this.dialogTitle = '编辑区域'
       },
       resetAll() {

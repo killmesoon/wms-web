@@ -1,6 +1,7 @@
 <template>
     <div>
-        <el-form :model="form" :rules="rules" size="small" ref="warehouseForm" label-position="right" :inline="isFormInline">
+        <el-form :model="form" :rules="rules" size="small" ref="warehouseForm" label-position="right"
+                 :inline="isFormInline">
             <el-form-item v-if="flag" label="工厂编码" :label-width="formLabelWidth">
                 <el-select v-model="form.plantCode" placeholder="请选择工厂编码" @change="plantChange" value-key="plantId">
                     <el-option
@@ -58,7 +59,7 @@
                 <el-input v-model="form.warehouseCode" placeholder="请定义仓库编码" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item v-else label="仓库编码" prop="warehouseCode" :label-width="formLabelWidth"
-                          >
+            >
                 <el-input v-model="form.warehouseCode" placeholder="请定义仓库编码" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item label="是否盘点" :label-width="formLabelWidth" v-if="flag">
@@ -75,11 +76,11 @@
                 </el-select>
             </el-form-item>
             <el-form-item v-if="flag" label="仓库名称" :label-width="formLabelWidth" prop="warehouseName">
-                <el-input v-model="form.warehouseName" placeholder="请输入仓库名称"  autocomplete="off"></el-input>
+                <el-input v-model="form.warehouseName" placeholder="请输入仓库名称" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item v-else label="仓库名称" :label-width="formLabelWidth" prop="warehouseName"
                           :rules="[{ required: true, message: '请输入仓库名称', trigger: 'blur' }]">
-                <el-input v-model="form.warehouseName"  placeholder="请输入仓库名称" autocomplete="off"></el-input>
+                <el-input v-model="form.warehouseName" placeholder="请输入仓库名称" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item v-if="flag" label="是否有效" :label-width="formLabelWidth">
                 <el-select v-model="form.enableFlag" placeholder="请选择是否有效">
@@ -95,7 +96,7 @@
                 </el-select>
             </el-form-item>
             <el-form-item v-if="flag" label="仓库简称" :label-width="formLabelWidth">
-                <el-input v-model="form.shortName" placeholder="请输入仓库简称"  autocomplete="off"></el-input>
+                <el-input v-model="form.shortName" placeholder="请输入仓库简称" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item v-else label="仓库简称" :label-width="formLabelWidth" prop="shortName"
                           :rules="[{ required: true, message: '请输入仓库简称', trigger: 'blur' }]">
@@ -110,8 +111,8 @@
 
 <script>
   import { mapGetters } from 'vuex'
-  import {checkWarehouseCodeExits} from '../../../../api/model/warehouse'
-  import {Message} from 'element-ui'
+  import { checkWarehouseCodeExits } from '../../../../api/model/warehouse'
+  import { Message } from 'element-ui'
 
   export default {
     name: 'WarehouseDialog',
@@ -123,7 +124,7 @@
     data() {
       var checkWarehouseCode = (rule, value, callback) => {
         if (!value) {
-          return callback(new Error('请定义仓库编码'));
+          return callback(new Error('请定义仓库编码'))
         }
         if (this.editFlag) {
           callback()
@@ -137,14 +138,14 @@
                 //存在相同
                 callback()
               } else {
-                return callback(new Error('该仓库编码已存在'));
+                return callback(new Error('该仓库编码已存在'))
               }
             }).catch(e => {
               Message.error(e)
             })
-          }, 500);
+          }, 500)
         }
-      };
+      }
       return {
         form: JSON.parse(JSON.stringify(this.data)),
         isFormInline: true,
@@ -180,8 +181,7 @@
       data: {
         immediate: true,
         handler: function(current, old) {
-          console.log(current)
-            this.form = JSON.parse(JSON.stringify(current))
+          this.form = JSON.parse(JSON.stringify(current))
           if (this.form.enableFlag != null) {
             this.form.enableFlag = this.form.enableFlag ? '1' : '0'
           }
