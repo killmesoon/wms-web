@@ -100,7 +100,6 @@
 
     .bottom-view {
         height: 60%;
-        padding: 10px;
         display: flex;
     }
 
@@ -112,7 +111,7 @@
     .job-item-view {
         width: 98%;
         height: 100%;
-        padding: 20px 20px;
+        padding: 5px 5px;
         background-color: #fff;
         display: flex;
     }
