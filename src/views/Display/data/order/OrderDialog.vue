@@ -8,7 +8,7 @@
                 </el-input>
             </el-form-item>
             <el-form-item v-else  label="快码" prop="lookupcode"   :label-width="formLabelWidth">
-                <el-input v-model="form.lookupcode" @click.native="chooseDic" ref="codeInput" :readonly="disable" placeholder="请选择快码"  autocomplete="off">
+                <el-input v-model="form.lookupcode" ref="codeInput"  placeholder="请输入快码"  autocomplete="off">
                 </el-input>
             </el-form-item>
             <el-form-item v-if="flag"  label="单据类型" :label-width="formLabelWidth">
@@ -16,7 +16,7 @@
                 </el-input>
             </el-form-item>
             <el-form-item v-else label="单据类型" :label-width="formLabelWidth">
-                <el-input v-model="form.docType" :disabled="disable"   autocomplete="off">
+                <el-input v-model="form.docType"   @focus="chooseDic"  autocomplete="off">
                 </el-input>
             </el-form-item>
             <el-form-item  v-if="flag" label="单据名称" :label-width="formLabelWidth">
@@ -36,7 +36,7 @@
                 </el-input>
             </el-form-item>
             <el-form-item v-if="!flag" prop="sequenceNum" label="位数" :label-width="formLabelWidth">
-                <el-input v-model.number="form.sequenceNum" placeholder="请输入位数" autocomplete="off">
+                <el-input v-model.number="form.sequenceNum" placeholder="请输入6到8位" autocomplete="off">
                 </el-input>
             </el-form-item>
             <el-form-item v-if="!flag" label="描述" :label-width="formLabelWidth">
@@ -44,68 +44,78 @@
                 </el-input>
             </el-form-item>
         </el-form>
-        <el-dialog :visible.sync="dialogVisible" :append-to-body="applyToBody" title="选择快码" width="90%" @open="loadTree">
-            <div class="tree-wrapper">
-                <el-card class="box-card left-view" shadow="never">
-                    <div slot="header" class="clearfix">
-                        <span>快码选择</span>
-                    </div>
-                    <div v-loading="treeLoading" class="container-item">
-                        <el-tree :data="treeData" :props="treeProps"
-                                 accordion @node-click="clickDic">
-                        </el-tree>
-                    </div>
-                </el-card>
-                <el-card class="box-card right-container" shadow="never">
-                    <div slot="header" class="clearfix name-title">
-                    </div>
-                    <div class="container-item">
-                        <div class="operation-view">
-                            <el-table
-                                    ref="table"
-                                    v-loading="treeLoading"
-                                    border
-                                    :max-height="tableHeight"
-                                    :data="tableData"
-                                    stripe
-                                    highlight-current-row
-                                    style="width: 100%"
-                            >
-                                <el-table-column prop="dicTypeCode" label="字典类型编码">
-                                </el-table-column>
-                                <el-table-column prop="dicTypeName" label="字典类型名称">
-                                </el-table-column>
-                                <el-table-column prop="dicCode" label="字典编码">
-                                </el-table-column>
-                                <el-table-column prop="dicName" label="字典名称">
-                                </el-table-column>
-                                <el-table-column prop="enableFlag" align="center" label="是否有效">
-                                    <template slot-scope="scope">
-                                        <span>{{scope.row.enableFlag ? 'Y': 'N'}}</span>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column prop="isSystem" align="center" label="是否系统录入">
-                                    <template slot-scope="scope">
-                                        <span>{{scope.row.isSystem ? 'Y': 'N'}}</span>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column
-                                        width="90"
-                                        fixed="right"
-                                        label="操作">
-                                    <template slot-scope="scope">
-                                        <el-button type="primary" size="mini"
-                                                   :disabled="scope.row.docFlag"
-                                                   icon="el-icon-plus"
-                                                   @click="chooseCode(scope.row)"
-                                        ></el-button>
-                                    </template>
-                                </el-table-column>
-                            </el-table>
-                        </div>
-                    </div>
-                </el-card>
-            </div>
+        <el-dialog :visible.sync="dialogVisible" :append-to-body="applyToBody" title="选择快码" width="50%" @open="loadTableData">
+            <el-table
+            :data="docTableData"
+            >
+                <el-table-column prop="" label="单据类型">
+
+                </el-table-column>
+                <el-table-column prop="" label="单据名称">
+
+                </el-table-column>
+            </el-table>
+<!--            <div class="tree-wrapper">-->
+<!--                <el-card class="box-card left-view" shadow="never">-->
+<!--                    <div slot="header" class="clearfix">-->
+<!--                        <span>快码选择</span>-->
+<!--                    </div>-->
+<!--                    <div v-loading="treeLoading" class="container-item">-->
+<!--                        <el-tree :data="treeData" :props="treeProps"-->
+<!--                                 accordion @node-click="clickDic">-->
+<!--                        </el-tree>-->
+<!--                    </div>-->
+<!--                </el-card>-->
+<!--                <el-card class="box-card right-container" shadow="never">-->
+<!--                    <div slot="header" class="clearfix name-title">-->
+<!--                    </div>-->
+<!--                    <div class="container-item">-->
+<!--                        <div class="operation-view">-->
+<!--                            <el-table-->
+<!--                                    ref="table"-->
+<!--                                    v-loading="treeLoading"-->
+<!--                                    border-->
+<!--                                    :max-height="tableHeight"-->
+<!--                                    :data="tableData"-->
+<!--                                    stripe-->
+<!--                                    highlight-current-row-->
+<!--                                    style="width: 100%"-->
+<!--                            >-->
+<!--                                <el-table-column prop="dicTypeCode" label="字典类型编码">-->
+<!--                                </el-table-column>-->
+<!--                                <el-table-column prop="dicTypeName" label="字典类型名称">-->
+<!--                                </el-table-column>-->
+<!--                                <el-table-column prop="dicCode" label="字典编码">-->
+<!--                                </el-table-column>-->
+<!--                                <el-table-column prop="dicName" label="字典名称">-->
+<!--                                </el-table-column>-->
+<!--                                <el-table-column prop="enableFlag" align="center" label="是否有效">-->
+<!--                                    <template slot-scope="scope">-->
+<!--                                        <span>{{scope.row.enableFlag ? 'Y': 'N'}}</span>-->
+<!--                                    </template>-->
+<!--                                </el-table-column>-->
+<!--                                <el-table-column prop="isSystem" align="center" label="是否系统录入">-->
+<!--                                    <template slot-scope="scope">-->
+<!--                                        <span>{{scope.row.isSystem ? 'Y': 'N'}}</span>-->
+<!--                                    </template>-->
+<!--                                </el-table-column>-->
+<!--                                <el-table-column-->
+<!--                                        width="90"-->
+<!--                                        fixed="right"-->
+<!--                                        label="操作">-->
+<!--                                    <template slot-scope="scope">-->
+<!--                                        <el-button type="primary" size="mini"-->
+<!--                                                   :disabled="scope.row.docFlag"-->
+<!--                                                   icon="el-icon-plus"-->
+<!--                                                   @click="chooseCode(scope.row)"-->
+<!--                                        ></el-button>-->
+<!--                                    </template>-->
+<!--                                </el-table-column>-->
+<!--                            </el-table>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </el-card>-->
+<!--            </div>-->
         </el-dialog>
     </div>
 </template>
@@ -129,9 +139,9 @@
           if (!Number.isInteger(value)) {
             callback(new Error('请输入数字值'));
           } else {
-            if (value > 10) {
-              callback(new Error('位数不得超过10'));
-            } else if (value < 4) {
+            if (value > 8) {
+              callback(new Error('位数不得超过8'));
+            } else if (value < 6) {
               callback(new Error('位数不能低于4位'));
             } else {
               callback()
@@ -162,6 +172,7 @@
         },
         tipViewHeight: 102,
         treeLoading: true,
+        docTableData: [],
         rules: {
           sequenceNum: [
             { required: true ,validator: checkSequenceNum, trigger: 'blur' }
@@ -195,6 +206,13 @@
             Message.error(e)
           })
         },500)
+      },
+      loadTableData() {
+        queryWmsDicListExtList().then(res => {
+
+        }).then(res => {
+          console.log(res)
+        })
       },
       clickDic(data, node, e) {
         if (data.children) {
