@@ -42,7 +42,7 @@
                 </el-table-column>
                 <el-table-column prop="itemSpec" label="规格">
                 </el-table-column>
-                <el-table-column prop="codeType" label="管理模式">
+                <el-table-column prop="codeTypeDic" label="管理模式">
                 </el-table-column>
                 <el-table-column prop="minPackageQty" width="100px" label="最小包装数">
                 </el-table-column>
