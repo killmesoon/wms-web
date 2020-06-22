@@ -76,12 +76,16 @@
                 </el-input>
             </el-form-item>
             <el-form-item v-if="flag" label="管理模式" :label-width="formLabelWidth">
-                <el-input v-model="form.codeType" placeholder="请输入管理模式" autocomplete="off">
-                </el-input>
+                <el-select v-model="form.codeType" placeholder="请选择管理模式">
+                    <el-option v-for="item in dicCodeTypeList" :value="item.dicId" :key="item.dicId"
+                               :label="item.dicName"></el-option>
+                </el-select>
             </el-form-item>
-            <el-form-item v-else prop="codeType" :rules="[{ required: true, message: '请输入管理模式', trigger: 'blur' }]"  label="管理模式" :label-width="formLabelWidth">
-                <el-input v-model="form.codeType" placeholder="请输入管理模式" autocomplete="off">
-                </el-input>
+            <el-form-item v-else prop="codeType" :rules="[{ required: true, message: '请选择管理模式', trigger: 'change' }]"  label="管理模式" :label-width="formLabelWidth">
+                <el-select v-model="form.codeType" placeholder="请选择管理模式">
+                    <el-option v-for="item in dicCodeTypeList" :value="item.dicId" :key="item.dicId"
+                               :label="item.dicName"></el-option>
+                </el-select>
             </el-form-item>
             <el-form-item v-if="!flag"  label="最小包装数" :label-width="formLabelWidth">
                 <el-input v-model="form.minPackageQty" placeholder="请输入最小包装数" autocomplete="off">
@@ -232,7 +236,8 @@
     computed: {
       ...mapGetters([
         'dicItemTypeList',
-        'dicYNList'
+        'dicYNList',
+        'dicCodeTypeList'
       ])
     },
     watch: {
@@ -249,6 +254,7 @@
             this.form.itemType = parseInt(this.form.itemType)
             this.form.enableFlag = this.form.enableFlag ? '1' : '0'
             this.form.iqcFlag = this.form.iqcFlag ? '1' : '0'
+            this.form.codeType = parseInt(this.form.codeType)
           }
         }
       },
