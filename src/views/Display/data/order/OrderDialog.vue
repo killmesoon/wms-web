@@ -61,7 +61,7 @@
                 <el-table-column prop="dicTypeCode" label="快码">
 
                 </el-table-column>
-                <el-table-column prop="dicTypeName" label="单据类型">
+                <el-table-column prop="dicTypeName" label="类型编码">
 
                 </el-table-column>
                 <el-table-column prop="dicName" label="单据名称">
@@ -69,7 +69,7 @@
                 </el-table-column>
                 <el-table-column label="操作" width="90">
                     <template slot-scope="scope">
-                        <el-button type="primary" size="mini" icon="el-icon-plus"
+                        <el-button type="primary" size="mini" :disabled="scope.row.docFlag"  icon="el-icon-plus"
                                    @click="chooseLookupCode(scope.row)"></el-button>
                     </template>
                 </el-table-column>
@@ -224,6 +224,18 @@
         // this.listQuery.keywords = message
         // this.listQuery.page = 1
         // this.initData()
+      },
+      chooseLookupCode(data) {
+        // docName docType
+        // data.dicName = this.form.docName
+        this.$nextTick(() => {
+          this.$set(this.form, 'lookupcode', data.dicTypeCode)
+          this.$set(this.form, 'docName', data.dicName)
+          // data.dicTypeName = this.form.docType
+          this.$set(this.form, 'docType', data.dicCode)
+          this.$refs.dialogForm.validateField('lookupcode')
+          this.dialogVisible = false
+        })
       },
       // loadTree() {
       //   //加载快码树信息
