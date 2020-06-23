@@ -58,9 +58,11 @@
                 <el-table-column prop="note" label="备注">
                 </el-table-column>
                                 <el-table-column
-                                        width="90"
+                                        width="120"
                                         label="操作">
                                     <template slot-scope="scope">
+                                        <el-button @click="editOutboundDetail(scope.row)" type="primary" size="mini" icon="el-icon-edit">
+                                        </el-button>
                                         <el-button  type="danger" size="mini" icon="el-icon-delete">
                                         </el-button>
                                     </template>
@@ -74,6 +76,13 @@
                     @pagination="initData"
             />
         </div>
+        <el-dialog :visible.sync="dialogDetailVisible" :title="dialogDetailTitle" width="60%" :close-on-click-modal="closeFlag" @close="resetAll">
+            <asn-detail-dialog  :data="orderDetailList" :line="lineItem" @event1="getFromSon" ref="asnDetailDialog"></asn-detail-dialog>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogDetailVisible = false">取 消</el-button>
+                <el-button type="primary" @click="confirmSubmitDetail">确 定</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
@@ -82,10 +91,12 @@
   import { mapGetters } from 'vuex'
   import { Message } from 'element-ui'
   import {queryWmsErpAsnDetailList} from '../../../api/asn'
+  import AsnDetailDialog from './AsnDetailDialog'
 
   export default {
     name: 'AsnDetailTable',
     components: {
+      AsnDetailDialog,
       Pagination
     },
     created() {
@@ -126,6 +137,9 @@
           })
         }
       },
+      editOutboundDetail(data) {
+        console.log(data)
+      }
     },
     computed: {
       ...mapGetters([
@@ -146,7 +160,10 @@
           startTime: '',
           endTime: ''
         },
-        total: 4
+        total: 4,
+        orderDetailList: [],
+        closeFlag: false,
+        dialogDetailTitle: '编辑送货单明细'
       }
     },
     watch: {

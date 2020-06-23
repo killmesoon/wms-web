@@ -244,31 +244,32 @@
         } else {
           this.$refs.asnDialog.$refs.asnOrderForm.validate((valid) => {
             if (valid) {
-              checkAsnOrderExits(this.form.asnNumber).then(res => {
-                if (res.data) {
-                  saveWmsErpAsnOrder({
-                    wmsErpAsnHead: this.form,
-                    wmsErpAsnLines: this.addOrderLineData
-                  }).then(res => {
-                    if (res.code == 200) {
-                      this.dialogHeadVisible = false
-                      this.form = {}
-                      this.addOrderLineData = []
-                      this.initData()
-                      //通知行信息更新
-                      this.notifyLineData()
-                      Message.success(res.msg)
-                    } else {
-                      Message.error(res.msg)
-                    }
-                  }).catch(e => {
-                    Message.error(e)
-                  })
-                } else {
-                  //重新生成订单
-                  Message.error("订单号重复，请重新生成")
+              // checkAsnOrderExits(this.form.asnNumber).then(res => {
+              //   if (res.data) {
+              //
+              //   } else {
+              //     //重新生成订单
+              //     Message.error("订单号重复，请重新生成")
+              //     this.form = {}
+              //   }
+              // })
+              saveWmsErpAsnOrder({
+                wmsErpAsnHead: this.form,
+                wmsErpAsnLines: this.addOrderLineData
+              }).then(res => {
+                if (res.code == 200) {
+                  this.dialogHeadVisible = false
                   this.form = {}
+                  this.addOrderLineData = []
+                  this.initData()
+                  //通知行信息更新
+                  this.notifyLineData()
+                  Message.success(res.msg)
+                } else {
+                  Message.error(res.msg)
                 }
+              }).catch(e => {
+                Message.error(e)
               })
             } else {
               return false
